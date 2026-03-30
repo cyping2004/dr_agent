@@ -1,0 +1,29 @@
+# LLM & Orchestration
+openai>=1.0
+langchain>=0.2
+langgraph>=0.1
+langchain-openai
+langchain-text-splitters
+langchain-chroma
+
+# Document Parsing
+pypdf
+pdfplumber
+unstructured[pdf]
+
+# Vector DB
+chromadb
+
+# Web Search
+tavily-python
+ddgs  # 备用
+
+# Utilities
+python-dotenv
+pydantic>=2.0
+rich               # 漂亮的CLI输出
+reportlab          # 用于测试PDF生成
+
+# Testing
+pytest
+pytest-asyncio
