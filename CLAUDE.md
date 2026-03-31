@@ -2,7 +2,7 @@
 
 ## 项目概述
 
-构建一个包含两个阶段的**human-in-the-loop深度研究代理**，支持将网络搜索结果直接作为上下文，或通过向量数据库进行压缩检索的多种模式。
+构建一个包含两个阶段的深度研究代理，支持将网络搜索结果直接作为上下文，或通过向量数据库进行压缩检索的多种模式，**human-in-the-loop 为可选附加功能**（启用时才会进入人工回圈，默认直接端到端运行）。
 1.  **offline ingestion** — 解析本地文档（PDF等），进行分块、嵌入，并存储在向量数据库中。
 2.  **online research agent** — 接受用户查询，规划研究任务，检索证据，自我反思证据是否充分，生成Markdown报告。
 
@@ -24,8 +24,26 @@
     *   **原理**: 仅检索本地已有的向量知识库，不联网。
     *   **适用场景**: 敏感数据处理、离线环境。
 
-4.  **全自动模式 (Auto/No-HITL)**:
-    *   上述任一模式均可配置是否启用 `auto_approve` 跳过人工批准环节，直接由查询生成最终报告。
+4.  **测试模式 (Test Mode)**:
+    *   **目标**: 在对比 Fast Web Baseline 与 Deep RAG 时，**共用同一份 Web 搜索结果**，仅比较“摘要压缩”和“向量检索”的效果，避免搜索随机性引入偏差。
+    *   **机制**: 第一次 Web 搜索结果写入 `state.web_search_cache`，随后两条路线均复用该缓存，不再重复调用搜索引擎。
+    *   **适用场景**: 实验评测、回归测试、对比算法效果。
+
+5.  **人机回圈开关 (HITL Toggle)**:
+    *   上述任一模式均可配置是否启用 `hitl_enabled`。默认 `False`，不暂停，端到端运行；启用后才会在计划与报告阶段等待人工批准。
+
+### 数据流与格式 (Fast Web vs Deep RAG)
+
+**Fast Web**: `Planner -> WebSearcher -> EvidenceFusion -> Writer`
+- WebSearcher 输出 `List[Document]`（`page_content` + `metadata`，包含 `url/title/source`）。
+- EvidenceFusion 消费 `state.retrieved_evidence`（`List[Document]`），内部格式化为带索引文本后进行总结。
+- Writer 优先使用 EvidenceFusion 产出的摘要列表；若无摘要则继续格式化 `List[Document]` 生成报告。
+
+**Deep RAG**: `Planner -> WebSearcher -> Ingestion -> Retriever -> EvidenceFusion -> Writer`
+- WebSearcher 输出 `List[Document]`。
+- Ingestion 对每个 `Document` 补充 `source/ingestion_session` 元数据后嵌入并写入向量库。
+- Retriever 从向量库检索得到 `List[Document]`（Top-K），写回 `state.retrieved_evidence`。
+- EvidenceFusion 与 Writer 的输入格式与 Fast Web 一致，均消费 `List[Document]`。
 
 ---
 
@@ -189,7 +207,9 @@ from dataclasses import dataclass, field
 class ResearchState:
     query: str
     mode: str = "deep_rag"  # 模式: "fast_web", "deep_rag", "local_only"
-    auto_approve: bool = False  # 是否跳过HITL批准
+    hitl_enabled: bool = False  # 是否启用HITL回圈（默认端到端）
+    test_mode: bool = False  # 是否启用测试模式（复用同一份Web搜索结果）
+    web_search_cache: list[Document] = field(default_factory=list)
     research_tasks: list[str] = field(default_factory=list)
     plan_approved: bool = False
     retrieved_evidence: list[Document] = field(default_factory=list)
@@ -295,6 +315,7 @@ def search(query: str, num_results: int = 5) -> list[Document]:
 - 使用 **Tavily API** (`tavily-python`) 进行研究级搜索。
 - 备用方案: `duckduckgo-search` (无需API密钥)。
 - 去除HTML，截断长页面，在元数据中保留 `url`。
+- 若 `state.test_mode=True` 且 `state.web_search_cache` 非空，则直接返回缓存结果，不触发真实搜索。
 
 ---
 
@@ -409,8 +430,8 @@ def build_graph() -> StateGraph:
     # 边与逻辑
     graph.set_entry_point("planner")
     
-    # 自动模式跳过计划批准
-    graph.add_conditional_edges("planner", lambda s: "router" if s.auto_approve else "hitl_plan")
+    # 默认端到端运行；启用HITL后才进入人工批准
+    graph.add_conditional_edges("planner", lambda s: "hitl_plan" if s.hitl_enabled else "router")
     graph.add_conditional_edges("hitl_plan", lambda s: "planner" if not s.plan_approved else "router")
 
     # 路由逻辑 (基于模式)
@@ -435,7 +456,7 @@ def build_graph() -> StateGraph:
     graph.add_edge("evidence_fusion", "reflection")
     graph.add_conditional_edges("reflection", lambda s: "router" if s.needs_more else "writer")
     
-    graph.add_conditional_edges("writer", lambda s: END if s.auto_approve else "hitl_report")
+    graph.add_conditional_edges("writer", lambda s: "hitl_report" if s.hitl_enabled else END)
     graph.add_conditional_edges("hitl_report", lambda s: "planner" if not s.report_approved else END)
 
     return graph.compile()
@@ -555,7 +576,7 @@ pytest-asyncio
 **目标**: 将网络搜索结果“压缩”进向量库，实现高相关性的上下文提取。
 
 8.  **即时摄取 (On-the-fly Ingestion)**
-    *   **Action**: 创建 `ingestion/bridge.py` 或在 `ingestion/__init__.py` 中暴露函数，允许将 `List[Document]` (来自 Web) 直接通过 Embedding 存入 VectorDB（临时 Collection 或打上 Session Tag）。
+    *   **Action**: 创建 `ingestion/bridge.py` 或在 `ingestion/__init__.py` 中暴露函数，允许将 `List[Document]` (来自 Web) 直接通过 Embedding 存入 VectorDB（打上 Session Tag）。
     *   **Validation**: 编写测试：搜索 Web -> 调用 Ingestion 函数 -> 立即查询 VectorDB -> 确认能查到刚才的 Web 内容。
 
 9.  **路由与图重构 (Router Refactor)**
@@ -563,16 +584,25 @@ pytest-asyncio
         - 逻辑：当 `mode="deep_rag"` 时，路径变为 `WebSearcher -> Ingester -> Retriever -> EvidenceFusion`。
     *   **Validation**: 运行 `tests/test_deep_rag.py`。验证流程日志：确认执行了网络搜索，确认执行了写入 DB 操作，确认最终 Retrieve 到了数据。对比 "Fast Web" 和 "Deep RAG" 对同一复杂问题的回答质量（可选）。
 
-### 阶段四：人机回圈与完善 (HITL & Polish)
+### 阶段四：测试模式 (Test Mode for Shared Web Results)
+**目标**: 确保 Fast Web 与 Deep RAG 复用同一份 Web 搜索结果，减少随机性误差。
+
+10. **搜索缓存与复用 (Web Cache Reuse)**
+    *   **Action**: 增加 `state.test_mode` 与 `state.web_search_cache` 的流程控制。
+        - 若 `test_mode=True` 且缓存为空：调用 Web Search 并写入缓存。
+        - 若 `test_mode=True` 且缓存已有：两条路线均直接复用缓存，不再触发真实搜索。
+    *   **Validation**: 同一 Query 运行 Fast Web 与 Deep RAG，确认 Web Search 只调用一次且两条路线拿到相同的 Document 列表。
+
+### 阶段五：人机回圈与完善 (HITL & Polish)
 **目标**: 增加人类控制点，完善系统稳定性。
 
-10. **交互节点 (HITL Nodes)**
-    *   **Action**: 实现 `agent/hitl.py`。在 Graph 中插入 `hitl_plan` 和 `hitl_report` 节点。实现 `auto_approve` 开关逻辑。
+11. **交互节点 (HITL Nodes)**
+    *   **Action**: 实现 `agent/hitl.py`。在 Graph 中插入 `hitl_plan` 和 `hitl_report` 节点。实现 `hitl_enabled` 开关逻辑。
     *   **Validation**: 运行 CLI。
-        - 测试场景 A: 拒绝计划，提供反馈 -> 确认 Planner 生成了新计划。
-        - 测试场景 B: 开启 `auto_approve=True`，确认全程无中断。
+        - 测试场景 A: 启用 `hitl_enabled`，拒绝计划，提供反馈 -> 确认 Planner 生成了新计划。
+        - 测试场景 B: 关闭 `hitl_enabled`，确认全程无中断。
 
-11. **自我反思 (Self-Reflection)**
+12. **自我反思 (Self-Reflection)**
     *   **Action**: 实现 `agent/reflection.py`。设置 `MAX_REFLECTION_ITERATIONS`。
     *   **Validation**: 构造一个“信息不足”的测试桩（Mock Retriever 返回空），确认 Graph 进入了 Reflection 循环并生成了新的搜索 Query。
 
@@ -580,8 +610,7 @@ pytest-asyncio
 
 ## 关键设计约束
 
-- **本地优先检索:** 除非是极速网络模式，否则在发出网络请求之前总是检查向量数据库。
-- **huamn in the loop是阻塞的:** 代理必须在两个检查点（计划批准和报告批准）完全暂停并等待人类输入。不要自动批准。
+- **HITL是阻塞的（仅在启用时）:** 代理在计划批准与报告批准时完全暂停并等待人类输入；默认不启用，端到端运行。
 - **循环安全:** 反思循环的上限为 `MAX_REFLECTION_ITERATIONS`。达到上限后，无论如何都继续进行写作。
 - **无状态节点:** 每个图节点接收完整的 `ResearchState` 并返回一个更新后的副本。没有全局突变。
 - **结构化输出:** 规划器和反思节点应使用 `response_format={"type": "json_object"}` 或Pydantic输出解析器以确保可靠性。
@@ -609,7 +638,11 @@ pytest-asyncio
     *   [ ] **Compression Effect**: 打印 "Deep RAG" 模式中间过程：Web Search (例如20条) -> Ingest -> Retrieve (例如Top-5)。验证 Retrieve 出的 Top-5 是否确实是 Top-20 中最相关的部分。
     *   [ ] **Mode Switching**: 设置不同 Mode，观察日志，确认 Pipeline 路径切换正确 (Fast Web 跳过 Ingest/Retrieve; Deep RAG 经过 Ingest/Retrieve)。
 
-4.  ### 交互与鲁棒性
+4.  ### 测试模式与可重复性
+    *   [ ] **Shared Web Cache**: 启用 `test_mode=True`，Fast Web 与 Deep RAG 仅触发一次真实 Web 搜索，复用同一份 Document 结果。
+    *   [ ] **Parity Check**: 同一 Query 下，确认两条路线起始证据完全一致，仅下游压缩/检索结果不同。
+
+5.  ### 交互与鲁棒性
     *   [ ] **HITL Interruption**: 在 Plan 阶段拒绝，提供 "请聚焦于 X 方面"，验证 Planner 生成了包含 X 的新计划。
     *   [ ] **Reflection Loop**: 模拟 "Evidence Insufficient"，观察系统是否自动生成了额外的搜索 Query 并执行了第二轮循环。
     *   [ ] **Final Report**: 检查最终 Markdown 报告格式，是否包含引用来源 `[1]` 等标记。

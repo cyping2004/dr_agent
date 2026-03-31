@@ -83,7 +83,7 @@ def test_local_only_mode(temp_local_kb):
     state = ResearchState(
         query="Python 是什么？有什么特点？",
         mode="local_only",
-        auto_approve=True
+        hitl_enabled=False
     )
 
     # 构建并运行图
@@ -170,7 +170,7 @@ def test_graph_local_mode_routing(temp_local_kb):
     state = ResearchState(
         query="测试查询",
         mode="local_only",
-        auto_approve=True
+        hitl_enabled=False
     )
 
     # 构建图

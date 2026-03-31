@@ -8,6 +8,7 @@ from typing import List
 
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
+from langchain_core.documents import Document
 from dotenv import load_dotenv
 
 from agent.state import ResearchState
@@ -40,7 +41,7 @@ def fuse(state: ResearchState) -> ResearchState:
         return state
 
     llm = ChatOpenAI(
-        model=os.getenv("OPENAI_MODEL", "qwen-max"),
+        model=os.getenv("OPENAI_MODEL", "qwen3-max"),
         api_key=os.getenv("OPENAI_API_KEY"),
         base_url=os.getenv("OPENAI_BASE_URL"),
         temperature=0
@@ -81,7 +82,7 @@ def fuse(state: ResearchState) -> ResearchState:
     return state
 
 
-def _format_evidence(evidence: List[str]) -> str:
+def _format_evidence(evidence: List[object]) -> str:
     """
     将证据列表格式化为带索引的文本。
 
@@ -94,9 +95,29 @@ def _format_evidence(evidence: List[str]) -> str:
     text = "可用证据:\n\n"
 
     for idx, evidence_item in enumerate(evidence, start=1):
-        text += f"[{idx}] {evidence_item}\n\n"
+        text += f"[{idx}] {_evidence_item_to_text(evidence_item)}\n\n"
 
     return text
+
+
+def _evidence_item_to_text(evidence_item: object) -> str:
+    """
+    将证据项转换为可读文本。
+    """
+    if isinstance(evidence_item, Document):
+        url = (evidence_item.metadata or {}).get("url", "")
+        source = (evidence_item.metadata or {}).get("source", "")
+        header_parts = []
+        if source:
+            header_parts.append(f"来源: {source}")
+        if url:
+            header_parts.append(f"URL: {url}")
+        header = " | ".join(header_parts)
+        if header:
+            return f"{header}\n内容: {evidence_item.page_content}"
+        return evidence_item.page_content
+
+    return str(evidence_item)
 
 
 def _build_fusion_prompt(task: str, evidence_text: str) -> str:

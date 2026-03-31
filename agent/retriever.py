@@ -121,6 +121,6 @@ def retrieve(state: ResearchState) -> ResearchState:
         retrieved_docs.extend(docs)
 
     # 更新状态
-    state.retrieved_evidence = [doc.page_content for doc in retrieved_docs]
+    state.retrieved_evidence = retrieved_docs
 
     return state

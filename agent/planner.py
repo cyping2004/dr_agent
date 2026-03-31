@@ -27,7 +27,7 @@ def plan(state: ResearchState) -> ResearchState:
         更新后的 ResearchState。
     """
     llm = ChatOpenAI(
-        model=os.getenv("OPENAI_MODEL", "qwen-max"),
+        model=os.getenv("OPENAI_MODEL", "qwen3-max"),
         api_key=os.getenv("OPENAI_API_KEY"),
         base_url=os.getenv("OPENAI_BASE_URL"),
         temperature=0

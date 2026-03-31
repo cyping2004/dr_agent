@@ -59,7 +59,6 @@ def build_graph() -> StateGraph:
     )
 
     # Web Searcher 边
-    graph.add_edge("web_searcher", "evidence_fusion")  # Fast Web 模式
     graph.add_conditional_edges(
         "web_searcher",
         lambda s: "ingester" if s.mode == "deep_rag" else "evidence_fusion",
@@ -129,21 +128,21 @@ def _web_search_node(state: ResearchState) -> ResearchState:
     Returns:
         更新后的 ResearchState。
     """
-    all_evidence = []
+    if state.test_mode and state.web_search_cache:
+        state.retrieved_evidence = list(state.web_search_cache)
+        return state
+
+    all_docs = []
 
     for task in state.research_tasks:
         print(f"[Web Search] 搜索任务: {task}")
         results = search(task, num_results=3)
+        all_docs.extend(results)
 
-        for result in results:
-            content = result.page_content
-            url = result.metadata.get("url", "")
+    state.retrieved_evidence = all_docs
 
-            # 格式化为带来源的证据
-            evidence_item = f"来源: {url}\n内容: {content}"
-            all_evidence.append(evidence_item)
-
-    state.retrieved_evidence = all_evidence
+    if state.test_mode:
+        state.web_search_cache = list(all_docs)
 
     return state
 
@@ -160,29 +159,26 @@ def _ingestion_node(state: ResearchState) -> ResearchState:
     """
     print("[Ingestion] 将网络搜索结果摄入向量数据库...")
 
-    # 将文本证据转换为 Document 对象
+    # 将 Web 结果补充 session 元数据后摄取
     from langchain_core.documents import Document
 
     docs = []
     for idx, evidence in enumerate(state.retrieved_evidence):
-        # 解析证据格式：来源: {url}\n内容: {content}
-        lines = evidence.split('\n', 1)
-        url = ""
-        content = evidence
-
-        if len(lines) > 1 and lines[0].startswith("来源:"):
-            url = lines[0].replace("来源:", "").strip()
-            content = lines[1].replace("内容:", "").strip()
-
-        doc = Document(
-            page_content=content,
-            metadata={
-                "source": "web_search",
-                "url": url,
-                "ingestion_session": f"{state.query[:20]}_{idx}",
-            }
-        )
-        docs.append(doc)
+        if isinstance(evidence, Document):
+            metadata = dict(evidence.metadata or {})
+            metadata.setdefault("source", "web_search")
+            metadata["ingestion_session"] = f"{state.query[:20]}_{idx}"
+            docs.append(Document(page_content=evidence.page_content, metadata=metadata))
+        else:
+            docs.append(
+                Document(
+                    page_content=str(evidence),
+                    metadata={
+                        "source": "web_search",
+                        "ingestion_session": f"{state.query[:20]}_{idx}",
+                    }
+                )
+            )
 
     # 存储到向量数据库
     try:

@@ -27,7 +27,7 @@ def test_fast_web_end_to_end():
         state = ResearchState(
             query="Python 基础语法",
             mode="fast_web",
-            auto_approve=True
+            hitl_enabled=False
         )
 
         # 构建并运行图
