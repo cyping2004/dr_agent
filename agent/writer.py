@@ -53,11 +53,14 @@ def write(state: ResearchState) -> ResearchState:
     # 获取证据摘要
     evidence_summaries = _extract_evidence_summaries(state)
 
-    if not evidence_summaries:
-        # 如果没有摘要，使用原始证据
-        evidence_text = _format_evidence(state.retrieved_evidence)
-    else:
-        evidence_text = _format_summaries(evidence_summaries)
+    # if not evidence_summaries:
+    #     # 如果没有摘要，使用原始证据
+    #     evidence_text = _format_evidence(state.retrieved_evidence)
+    # else:
+    #     evidence_text = _format_summaries(evidence_summaries)
+
+    # 直接使用原始证据
+    evidence_text = _format_evidence(state.retrieved_evidence)
 
     prompt = _build_writer_prompt(state.query, evidence_text)
 
