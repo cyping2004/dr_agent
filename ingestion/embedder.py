@@ -5,14 +5,38 @@
 """
 
 import os
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 from functools import lru_cache
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from openai import OpenAI
 from langchain_core.documents import Document
 from dotenv import load_dotenv
 
+try:
+    from sentence_transformers import SentenceTransformer
+except ImportError:
+    SentenceTransformer = None
+
 load_dotenv()
+
+
+def _get_int_env(name: str, default: int) -> int:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    try:
+        parsed = int(value)
+    except ValueError:
+        return default
+    return parsed if parsed > 0 else default
+
+
+def _get_bool_env(name: str, default: bool) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "y", "on"}
 
 
 class Embedder:
@@ -32,12 +56,48 @@ class Embedder:
             "text-embedding-v1"
         )
 
+        self.local_model_path = os.getenv("EMBEDDING_MODEL_PATH") or os.getenv("EMBEDDING_LOCAL_PATH")
+        self.local_device = os.getenv("EMBEDDING_DEVICE", "cpu")
+        self.local_batch_size = _get_int_env("EMBEDDING_LOCAL_BATCH_SIZE", 32)
+        self.local_normalize = _get_bool_env("EMBEDDING_NORMALIZE", True)
+        self.local_model = self._load_local_model(self.local_model_path) if self.local_model_path else None
+
+        self.parallel_enabled = _get_bool_env("EMBEDDING_PARALLEL", True)
+        self.max_workers = _get_int_env("EMBEDDING_MAX_WORKERS", 2)
+
         self.client = OpenAI(
             api_key=os.getenv("OPENAI_API_KEY"),
             base_url=os.getenv("OPENAI_BASE_URL"),
         )
 
-    def _embed_texts(self, texts: List[str]) -> List[List[float]]:
+    def _load_local_model(self, model_path: str) -> Optional["SentenceTransformer"]:
+        if SentenceTransformer is None:
+            print("[Embedder] sentence-transformers not installed; using API embeddings.")
+            return None
+        try:
+            return SentenceTransformer(
+                model_path,
+                trust_remote_code=True,
+                device=self.local_device,
+            )
+        except Exception as e:
+            print(f"[Embedder] Failed to load local embedding model: {e}. Using API embeddings.")
+            return None
+
+    def _embed_texts(self, texts: List[str], batch_size: Optional[int] = None) -> List[List[float]]:
+        if self.local_model is not None:
+            try:
+                local_batch_size = batch_size or self.local_batch_size
+                embeddings = self.local_model.encode(
+                    texts,
+                    batch_size=local_batch_size,
+                    normalize_embeddings=self.local_normalize,
+                    show_progress_bar=False,
+                )
+                return [embedding.tolist() for embedding in embeddings]
+            except Exception as e:
+                print(f"[Embedder] Local embedding failed: {e}. Falling back to API.")
+
         response = self.client.embeddings.create(
             model=self.model_name,
             input=texts,
@@ -57,7 +117,7 @@ class Embedder:
         """
         # 清除缓存键中的多余空白
         text = ' '.join(text.split())
-        return self._embed_texts([text])[0]
+        return self._embed_texts([text], batch_size=1)[0]
 
     def embed_documents(
         self,
@@ -76,15 +136,35 @@ class Embedder:
         """
         results = []
 
-        # 批量处理文档
-        for i in range(0, len(docs), batch_size):
+        if batch_size <= 0:
+            batch_size = 1
+
+        batches: List[Tuple[int, List[Document], List[str]]] = []
+        for batch_index, i in enumerate(range(0, len(docs), batch_size)):
             batch = docs[i:i + batch_size]
             texts = [' '.join(doc.page_content.split()) for doc in batch]
+            batches.append((batch_index, batch, texts))
 
-            # 调用批量嵌入
-            embeddings = self._embed_texts(texts)
+        if not self.parallel_enabled or len(batches) == 1:
+            for _, batch, texts in batches:
+                embeddings = self._embed_texts(texts, batch_size=batch_size)
+                for doc, embedding in zip(batch, embeddings):
+                    results.append((doc, embedding))
+            return results
 
-            # 组合结果
+        embeddings_by_index: dict[int, Tuple[List[Document], List[List[float]]]] = {}
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            future_map = {
+                executor.submit(self._embed_texts, texts, batch_size): (batch_index, batch)
+                for batch_index, batch, texts in batches
+            }
+            for future in as_completed(future_map):
+                batch_index, batch = future_map[future]
+                embeddings = future.result()
+                embeddings_by_index[batch_index] = (batch, embeddings)
+
+        for batch_index in sorted(embeddings_by_index):
+            batch, embeddings = embeddings_by_index[batch_index]
             for doc, embedding in zip(batch, embeddings):
                 results.append((doc, embedding))
 

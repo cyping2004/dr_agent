@@ -136,7 +136,7 @@ def _web_search_node(state: ResearchState) -> ResearchState:
 
     for task in state.research_tasks:
         print(f"[Web Search] 搜索任务: {task}")
-        results = search(task, num_results=3)
+        results = search(task, num_results=5)
         all_docs.extend(results)
 
     state.retrieved_evidence = all_docs

@@ -12,8 +12,8 @@ from langchain_core.documents import Document
 
 def chunk_documents(
     docs: List[Document],
-    chunk_size: int = 512,
-    overlap: int = 64,
+    chunk_size: int = 1024,
+    overlap: int = 32,
     chunk_by: str = "char"
 ) -> List[Document]:
     """
@@ -72,8 +72,8 @@ def chunk_documents(
 
 def chunk_document(
     doc: Document,
-    chunk_size: int = 512,
-    overlap: int = 64
+    chunk_size: int = 1024,
+    overlap: int = 32
 ) -> List[Document]:
     """
     对单个文档进行分块。

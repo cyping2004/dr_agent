@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def search(query: str, num_results: int = 5) -> List[Document]:
+def search(query: str, num_results: int = 10) -> List[Document]:
     """
     执行网络搜索，返回结果作为 Document 对象。
 
@@ -54,19 +54,19 @@ def _search_tavily(query: str, num_results: int) -> List[Document]:
         search_depth="basic",
         max_results=num_results,
         include_answer=False,
+        include_raw_content="text",
     )
 
     docs = []
     for result in response.get("results", []):
-        content = result.get("content", "")
+        raw_content = result.get("raw_content", "")
+        content = raw_content or result.get("content", "")
         url = result.get("url", "")
         title = result.get("title", "")
 
         # 去除 HTML 标签并截断长内容
         import re
         content = re.sub(r'<[^>]+>', '', content)
-        if len(content) > 2000:
-            content = content[:2000] + "..."
 
         doc = Document(
             page_content=content,

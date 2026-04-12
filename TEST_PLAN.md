@@ -335,8 +335,18 @@ eval_results/
 1. **Relevance**：报告是否回答了原始查询
 2. **Completeness**：是否覆盖了所有重要的子话题
 3. **Coherence**：逻辑是否清晰连贯
-4. **Factuality**：事实陈述是否准确
-5. **Citation**：引用是否准确对应
+4. **Faithfulness / Groundedness**：结论是否被检索证据支持（基于证据一致性）
+
+**评估流程（建议实现）**：
+1. **Claim 抽取**：从报告中抽取 5-10 条原子化、可验证的事实声明。
+2. **证据检索**：对每条 Claim 在“缓存文档的分块结果”中检索 top-k 证据块，避免塞全文。
+3. **逐条判定**：LLM 对每条 Claim 输出 `supported / contradicted / insufficient`。
+4. **Faithfulness 计算**：`supported_count / total_claims`，并可映射为 1-5 分。
+5. **质量评分**：基于 Query 与 `expected_topics` 给出 Relevance / Completeness / Coherence。
+
+**上下文控制**：
+- 不喂完整原始文档，仅提供每条 Claim 的 top-k 证据块（含 URL/标题）。
+- 对证据块设定最大字符数，保证评估成本可控。
 
 **输出示例**：
 ```json
@@ -346,16 +356,16 @@ eval_results/
     "relevance": 3.5,
     "completeness": 3.8,
     "coherence": 4.2,
-    "factuality": 4.0,
-    "citation": 4.3,
+    "faithfulness": 4.1,
+    "faithfulness_ratio": 0.82,
     "average": 4.16
   },
   "deep_rag_scores": {
     "relevance": 4.7,
     "completeness": 4.5,
     "coherence": 4.6,
-    "factuality": 4.4,
-    "citation": 4.8,
+    "faithfulness": 4.6,
+    "faithfulness_ratio": 0.92,
     "average": 4.60
   },
   "comparison": {
@@ -368,6 +378,8 @@ eval_results/
   }
 }
 ```
+
+**脚本参考**：`eval/scripts/run_llm_judge.py`
 
 ### 5.2 人工评估（抽样验证）
 
@@ -393,38 +405,40 @@ eval_results/
 
 ## 六、执行计划
 
+**设计说明（串行对比）**：为保证可重复性和指标可信度，对比测试采用**串行执行**：先运行 Fast Web，再运行 Deep RAG，并复用同一份前半段缓存。指标至少包含前半段耗时、后半段 ingest/retrieve/writer 耗时、总耗时、文档/Token 压缩比。
+
 ### 6.1 开发阶段（Week 1-2）
 
-- [ ] 实现 Graph 拆分逻辑（前半段独立模块）（保留原有的文件逻辑，新增文件实现新的拆分逻辑）
-- [ ] 实现缓存序列化/反序列化
-- [ ] 实现后半段并行执行
-- [ ] 实现指标收集和记录
+- 实现 Graph 拆分逻辑（前半段独立模块）（保留原有的文件逻辑，新增文件实现新的拆分逻辑）
+- 实现缓存序列化/反序列化
+- 实现后半段串行执行（先 Fast Web，后 Deep RAG）
+- 实现指标收集和记录
 
 ### 6.2 数据准备阶段（Week 2-3）
 
-- [ ] 构建基础功能测试集（10 个查询）
-- [ ] 运行前半段生成缓存数据
-- [ ] 验证缓存数据完整性
+- 构建基础功能测试集（10 个查询）
+- 运行前半段生成缓存数据
+- 验证缓存数据完整性
 
 ### 6.3 初步测试阶段（Week 3）
 
-- [ ] 运行对比测试（基础集）
-- [ ] 收集性能指标
-- [ ] 初步分析结果
+- 运行对比测试（基础集，串行）
+- 收集性能指标
+- 初步分析结果
 
 ### 6.4 扩展测试阶段（Week 4-5）
 
-- [ ] 构建质量对比测试集（50 个查询）
-- [ ] 运行大规模对比测试
-- [ ] 实现 LLM-as-Judge 评估
-- [ ] 人工抽样评估（10-20 个样本）
+- 构建质量对比测试集（50 个查询）
+- 运行大规模对比测试
+- 实现 LLM-as-Judge 评估
+- 人工抽样评估（10-20 个样本）
 
 ### 6.5 分析与优化阶段（Week 5-6）
 
-- [ ] 统计分析测试结果
-- [ ] 生成可视化报告
-- [ ] 根据结果优化 Deep RAG 参数
-- [ ] 编写测试报告和文档
+- 统计分析测试结果
+- 生成可视化报告
+- 根据结果优化 Deep RAG 参数
+- 编写测试报告和文档
 
 ---
 

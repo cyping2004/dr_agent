@@ -4,7 +4,7 @@
 """
 
 import os
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
@@ -57,8 +57,13 @@ def write(state: ResearchState) -> ResearchState:
     # else:
     #     evidence_text = _format_summaries(evidence_summaries)
 
+    per_doc_max_chars: Optional[int] = None
+    if state.mode == "fast_web":
+        # Cap per-document length to avoid oversized prompts in Fast Web.
+        per_doc_max_chars = _get_fast_web_doc_max_chars()
+
     # 直接使用原始证据
-    evidence_text = _format_evidence(state.retrieved_evidence)
+    evidence_text = _format_evidence(state.retrieved_evidence, per_doc_max_chars)
 
     prompt = _build_writer_prompt(state.query, evidence_text)
 
@@ -97,7 +102,10 @@ def _extract_evidence_summaries(state: ResearchState) -> List[Dict]:
     return summaries
 
 
-def _format_evidence(evidence: List[object]) -> str:
+def _format_evidence(
+    evidence: List[object],
+    per_doc_max_chars: Optional[int] = None
+) -> str:
     """
     格式化原始证据。
 
@@ -113,12 +121,15 @@ def _format_evidence(evidence: List[object]) -> str:
     text = "收集到的证据:\n\n"
 
     for idx, evidence_item in enumerate(evidence, start=1):
-        text += f"[{idx}] {_evidence_item_to_text(evidence_item)}\n\n"
+        text += f"[{idx}] {_evidence_item_to_text(evidence_item, per_doc_max_chars)}\n\n"
 
     return text
 
 
-def _evidence_item_to_text(evidence_item: object) -> str:
+def _evidence_item_to_text(
+    evidence_item: object,
+    max_chars: Optional[int] = None
+) -> str:
     """
     将证据项转换为可读文本。
     """
@@ -131,9 +142,12 @@ def _evidence_item_to_text(evidence_item: object) -> str:
         if url:
             header_parts.append(f"URL: {url}")
         header = " | ".join(header_parts)
+        content = evidence_item.page_content
+        if max_chars:
+            content = _truncate_text(content, max_chars)
         if header:
-            return f"{header}\n内容: {evidence_item.page_content}"
-        return evidence_item.page_content
+            return f"{header}\n内容: {content}"
+        return content
 
     return str(evidence_item)
 
@@ -161,6 +175,25 @@ def _format_summaries(summaries: List[Dict]) -> str:
         text += f"{summary_text}\n\n"
 
     return text
+
+
+def _truncate_text(text: str, max_chars: int) -> str:
+    if max_chars <= 0:
+        return text
+    if len(text) <= max_chars:
+        return text
+    return text[:max_chars].rstrip() + "..."
+
+
+def _get_fast_web_doc_max_chars() -> int:
+    value = os.getenv("FAST_WEB_DOC_MAX_CHARS")
+    if value is None:
+        return 1000
+    try:
+        parsed = int(value)
+    except ValueError:
+        return 1000
+    return parsed if parsed > 0 else 1000
 
 
 def _build_writer_prompt(query: str, evidence_text: str) -> str:

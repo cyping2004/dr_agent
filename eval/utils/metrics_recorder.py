@@ -105,9 +105,13 @@ class MetricsRecorder:
         fieldnames = [
             "query_id", "query", "timestamp",
             "fast_web_total_time", "fast_web_writer_time",
+            "fast_web_input_tokens", "fast_web_output_tokens",
             "deep_rag_total_time", "deep_rag_ingest_time",
             "deep_rag_retrieve_time", "deep_rag_writer_time",
-            "compression_ratio", "original_doc_count", "retrieved_doc_count"
+            "deep_rag_input_tokens", "deep_rag_output_tokens",
+            "compression_ratio", "compression_ratio_tokens",
+            "original_doc_count", "retrieved_doc_count",
+            "original_chunk_count", "retrieved_chunk_count"
         ]
 
         with open(filepath, 'w', newline='', encoding='utf-8') as f:
@@ -115,19 +119,43 @@ class MetricsRecorder:
             writer.writeheader()
 
             for result in self.results:
+                fast_total = result.fast_web_metrics.get(
+                    "total_backend_time",
+                    result.fast_web_metrics.get("total_time_ms", 0)
+                )
+                fast_writer = result.fast_web_metrics.get(
+                    "writer_time",
+                    result.fast_web_metrics.get("writer_time_ms", 0)
+                )
+                rag_total = result.deep_rag_metrics.get(
+                    "total_backend_time",
+                    result.deep_rag_metrics.get("total_time_ms", 0)
+                )
+                rag_writer = result.deep_rag_metrics.get(
+                    "writer_time",
+                    result.deep_rag_metrics.get("writer_time_ms", 0)
+                )
+
                 row = {
                     "query_id": result.query_id,
                     "query": result.query[:50] + "..." if len(result.query) > 50 else result.query,
                     "timestamp": result.timestamp,
-                    "fast_web_total_time": result.fast_web_metrics.get("total_backend_time", 0),
-                    "fast_web_writer_time": result.fast_web_metrics.get("writer_time", 0),
-                    "deep_rag_total_time": result.deep_rag_metrics.get("total_backend_time", 0),
+                    "fast_web_total_time": fast_total,
+                    "fast_web_writer_time": fast_writer,
+                    "fast_web_input_tokens": result.fast_web_metrics.get("input_tokens", 0),
+                    "fast_web_output_tokens": result.fast_web_metrics.get("output_tokens", 0),
+                    "deep_rag_total_time": rag_total,
                     "deep_rag_ingest_time": result.deep_rag_metrics.get("ingest_time", 0),
                     "deep_rag_retrieve_time": result.deep_rag_metrics.get("retrieve_time", 0),
-                    "deep_rag_writer_time": result.deep_rag_metrics.get("writer_time", 0),
+                    "deep_rag_writer_time": rag_writer,
+                    "deep_rag_input_tokens": result.deep_rag_metrics.get("input_tokens", 0),
+                    "deep_rag_output_tokens": result.deep_rag_metrics.get("output_tokens", 0),
                     "compression_ratio": result.deep_rag_metrics.get("compression_ratio", 0),
+                    "compression_ratio_tokens": result.deep_rag_metrics.get("compression_ratio_tokens", 0),
                     "original_doc_count": result.deep_rag_metrics.get("original_doc_count", 0),
-                    "retrieved_doc_count": result.deep_rag_metrics.get("retrieved_doc_count", 0)
+                    "retrieved_doc_count": result.deep_rag_metrics.get("retrieved_doc_count", 0),
+                    "original_chunk_count": result.deep_rag_metrics.get("original_chunk_count", 0),
+                    "retrieved_chunk_count": result.deep_rag_metrics.get("retrieved_chunk_count", 0)
                 }
                 writer.writerow(row)
 
@@ -168,8 +196,14 @@ class MetricsRecorder:
         if not self.results:
             return {"error": "No results to summarize"}
 
-        fast_times = [r.fast_web_metrics.get("total_backend_time", 0) for r in self.results]
-        rag_times = [r.deep_rag_metrics.get("total_backend_time", 0) for r in self.results]
+        fast_times = [
+            r.fast_web_metrics.get("total_backend_time", r.fast_web_metrics.get("total_time_ms", 0))
+            for r in self.results
+        ]
+        rag_times = [
+            r.deep_rag_metrics.get("total_backend_time", r.deep_rag_metrics.get("total_time_ms", 0))
+            for r in self.results
+        ]
 
         fast_avg = sum(fast_times) / len(fast_times) if fast_times else 0
         rag_avg = sum(rag_times) / len(rag_times) if rag_times else 0
@@ -179,6 +213,15 @@ class MetricsRecorder:
             for r in self.results
         ]
         avg_compression = sum(compression_ratios) / len(compression_ratios) if compression_ratios else 0
+
+        compression_ratios_tokens = [
+            r.deep_rag_metrics.get("compression_ratio_tokens", 0)
+            for r in self.results
+        ]
+        avg_compression_tokens = (
+            sum(compression_ratios_tokens) / len(compression_ratios_tokens)
+            if compression_ratios_tokens else 0
+        )
 
         return {
             "total_queries": len(self.results),
@@ -197,6 +240,11 @@ class MetricsRecorder:
                 "time_overhead_percent": ((rag_avg - fast_avg) / fast_avg * 100) if fast_avg > 0 else 0
             },
             "compression": {
-                "avg_compression_ratio": avg_compression
+                "avg_compression_ratio": avg_compression,
+                "avg_compression_ratio_tokens": avg_compression_tokens
             }
         }
+
+    def get_summary(self) -> Dict[str, Any]:
+        """Backward-compatible summary accessor."""
+        return self.generate_summary_report()

@@ -1,0 +1,75 @@
+{
+  "total_queries": 10,
+  "creation_date": "2026-04-07T09:11:04.047274",
+  "queries": {
+    "q001": {
+      "query": "What is the Transformer architecture?",
+      "num_tasks": 7,
+      "num_documents": 66,
+      "timestamp": "2026-04-09T07:45:57.190137"
+    },
+    "q002": {
+      "query": "Who won the 2024 Nobel Prize in Physics?",
+      "num_tasks": 6,
+      "num_documents": 59,
+      "timestamp": "2026-04-09T07:46:32.326779"
+    },
+    "q003": {
+      "query": "What are common data structures in Python?",
+      "num_tasks": 7,
+      "num_documents": 67,
+      "timestamp": "2026-04-09T07:47:15.639847"
+    },
+    "q004": {
+      "query": "What are the main differences between GPT-4 and Claude 3?",
+      "num_tasks": 7,
+      "num_documents": 67,
+      "timestamp": "2026-04-09T07:48:01.084709"
+    },
+    "q005": {
+      "query": "How does RAG (Retrieval-Augmented Generation) work?",
+      "num_tasks": 7,
+      "num_documents": 63,
+      "timestamp": "2026-04-09T07:48:45.204742"
+    },
+    "q006": {
+      "query": "Compare React and Vue.js pros and cons",
+      "num_tasks": 6,
+      "num_documents": 60,
+      "timestamp": "2026-04-09T07:49:30.155407"
+    },
+    "q007": {
+      "query": "What are best practices for Docker containerization?",
+      "num_tasks": 7,
+      "num_documents": 64,
+      "timestamp": "2026-04-09T07:50:02.885405"
+    },
+    "q008": {
+      "query": "What is a vector database? What are common vector databases?",
+      "num_tasks": 7,
+      "num_documents": 66,
+      "timestamp": "2026-04-09T07:50:37.112511"
+    },
+    "q009": {
+      "query": "What are advantages and challenges of microservices architecture?",
+      "num_tasks": 7,
+      "num_documents": 63,
+      "timestamp": "2026-04-09T07:51:10.352146"
+    },
+    "q010": {
+      "query": "What are the differences between Pod, Deployment, and Service in Kubernetes?",
+      "num_tasks": 7,
+      "num_documents": 66,
+      "timestamp": "2026-04-09T07:51:49.471904"
+    }
+  },
+  "last_updated": "2026-04-09T07:51:49.518624",
+  "run": {
+    "dataset": "eval/datasets/basic_10.json",
+    "provider": "tavily",
+    "total_queries": 10,
+    "successful": 10,
+    "skipped": 0,
+    "failed": 0
+  }
+}

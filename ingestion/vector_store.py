@@ -87,12 +87,24 @@ class VectorStore:
             ids = [str(uuid4()) for _ in texts]
         elif len(ids) != len(texts):
             raise ValueError("IDs size must match texts size")
-        self.collection.add(
-            ids=ids,
-            documents=texts,
-            metadatas=metadatas,
-            embeddings=embeddings,
-        )
+        max_batch_size = None
+        if hasattr(self.client, "get_max_batch_size"):
+            try:
+                max_batch_size = self.client.get_max_batch_size()
+            except Exception:
+                max_batch_size = None
+
+        if not max_batch_size or max_batch_size <= 0:
+            max_batch_size = len(texts)
+
+        for start in range(0, len(texts), max_batch_size):
+            end = start + max_batch_size
+            self.collection.add(
+                ids=ids[start:end],
+                documents=texts[start:end],
+                metadatas=metadatas[start:end],
+                embeddings=embeddings[start:end],
+            )
 
         return len(texts)
 
