@@ -1,0 +1,458 @@
+{
+  "dataset_name": "en_50",
+  "version": "1.0",
+  "description": "English query set (50 queries, 5 categories x 10 each)",
+  "created_at": "2026-04-13T00:00:00Z",
+  "queries": [
+    {
+      "id": "q001",
+      "query": "What is quantum entanglement?",
+      "category": "definition",
+      "description": "Concept definition query",
+      "expected_topics": ["quantum mechanics", "entangled states", "correlation", "Bell inequality"],
+      "difficulty": "medium",
+      "tags": ["physics", "quantum"]
+    },
+    {
+      "id": "q002",
+      "query": "What is carbon neutrality?",
+      "category": "definition",
+      "description": "Concept definition query",
+      "expected_topics": ["net zero", "emissions", "offsets", "greenhouse gases"],
+      "difficulty": "easy",
+      "tags": ["climate", "environment"]
+    },
+    {
+      "id": "q003",
+      "query": "What is edge computing?",
+      "category": "definition",
+      "description": "Concept definition query",
+      "expected_topics": ["low latency", "IoT", "distributed computing", "cloud"],
+      "difficulty": "medium",
+      "tags": ["computing", "IoT"]
+    },
+    {
+      "id": "q004",
+      "query": "What is inflation in economics?",
+      "category": "definition",
+      "description": "Concept definition query",
+      "expected_topics": ["price level", "CPI", "monetary policy"],
+      "difficulty": "easy",
+      "tags": ["economics", "macroeconomics"]
+    },
+    {
+      "id": "q005",
+      "query": "What is a supply chain?",
+      "category": "definition",
+      "description": "Concept definition query",
+      "expected_topics": ["procurement", "production", "logistics", "distribution"],
+      "difficulty": "easy",
+      "tags": ["business", "logistics"]
+    },
+    {
+      "id": "q006",
+      "query": "What is an API gateway?",
+      "category": "definition",
+      "description": "Concept definition query",
+      "expected_topics": ["microservices", "routing", "authentication", "rate limiting"],
+      "difficulty": "medium",
+      "tags": ["api", "architecture"]
+    },
+    {
+      "id": "q007",
+      "query": "What is a differential equation?",
+      "category": "definition",
+      "description": "Concept definition query",
+      "expected_topics": ["derivatives", "modeling", "ODE", "PDE"],
+      "difficulty": "medium",
+      "tags": ["math", "calculus"]
+    },
+    {
+      "id": "q008",
+      "query": "What is biodiversity?",
+      "category": "definition",
+      "description": "Concept definition query",
+      "expected_topics": ["species diversity", "ecosystems", "conservation"],
+      "difficulty": "easy",
+      "tags": ["ecology", "environment"]
+    },
+    {
+      "id": "q009",
+      "query": "What is the MIT License?",
+      "category": "definition",
+      "description": "Concept definition query",
+      "expected_topics": ["open source", "permissions", "copyright notice"],
+      "difficulty": "easy",
+      "tags": ["open source", "license"]
+    },
+    {
+      "id": "q010",
+      "query": "What is reinforcement learning?",
+      "category": "definition",
+      "description": "Concept definition query",
+      "expected_topics": ["agent", "reward", "policy", "MDP"],
+      "difficulty": "medium",
+      "tags": ["machine learning", "AI"]
+    },
+    {
+      "id": "q011",
+      "query": "Compare TCP and UDP.",
+      "category": "comparison",
+      "description": "Comparison query",
+      "expected_topics": ["transport layer", "reliability", "connection", "latency"],
+      "difficulty": "easy",
+      "tags": ["networking", "TCP", "UDP"]
+    },
+    {
+      "id": "q012",
+      "query": "Compare SQL and NoSQL databases.",
+      "category": "comparison",
+      "description": "Comparison query",
+      "expected_topics": ["schema", "consistency", "scalability", "query model"],
+      "difficulty": "medium",
+      "tags": ["databases", "SQL", "NoSQL"]
+    },
+    {
+      "id": "q013",
+      "query": "Compare solar and wind energy.",
+      "category": "comparison",
+      "description": "Comparison query",
+      "expected_topics": ["renewable energy", "cost", "capacity factor", "intermittency"],
+      "difficulty": "medium",
+      "tags": ["energy", "solar", "wind"]
+    },
+    {
+      "id": "q014",
+      "query": "Compare iOS and Android.",
+      "category": "comparison",
+      "description": "Comparison query",
+      "expected_topics": ["ecosystem", "app store", "fragmentation", "development"],
+      "difficulty": "medium",
+      "tags": ["mobile", "iOS", "Android"]
+    },
+    {
+      "id": "q015",
+      "query": "Compare monolith vs microservices architecture.",
+      "category": "comparison",
+      "description": "Comparison query",
+      "expected_topics": ["deployment", "scalability", "complexity", "service boundaries"],
+      "difficulty": "medium",
+      "tags": ["architecture", "microservices"]
+    },
+    {
+      "id": "q016",
+      "query": "Compare ETFs and mutual funds.",
+      "category": "comparison",
+      "description": "Comparison query",
+      "expected_topics": ["fees", "liquidity", "tracking", "management"],
+      "difficulty": "medium",
+      "tags": ["finance", "investing"]
+    },
+    {
+      "id": "q017",
+      "query": "Compare electric vehicles and gasoline cars.",
+      "category": "comparison",
+      "description": "Comparison query",
+      "expected_topics": ["total cost", "range", "charging", "emissions"],
+      "difficulty": "medium",
+      "tags": ["transportation", "EV"]
+    },
+    {
+      "id": "q018",
+      "query": "Compare public cloud vs private cloud.",
+      "category": "comparison",
+      "description": "Comparison query",
+      "expected_topics": ["security", "cost", "control", "compliance"],
+      "difficulty": "medium",
+      "tags": ["cloud", "infrastructure"]
+    },
+    {
+      "id": "q019",
+      "query": "Compare supervised and unsupervised learning.",
+      "category": "comparison",
+      "description": "Comparison query",
+      "expected_topics": ["labels", "training data", "tasks", "evaluation"],
+      "difficulty": "easy",
+      "tags": ["machine learning", "comparison"]
+    },
+    {
+      "id": "q020",
+      "query": "Compare REST and GraphQL.",
+      "category": "comparison",
+      "description": "Comparison query",
+      "expected_topics": ["API design", "query flexibility", "overfetching", "caching"],
+      "difficulty": "medium",
+      "tags": ["API", "web"]
+    },
+    {
+      "id": "q021",
+      "query": "What is the boiling point of water at sea level?",
+      "category": "fact",
+      "description": "Simple fact query",
+      "expected_topics": ["100 C", "boiling point", "sea level"],
+      "difficulty": "easy",
+      "tags": ["science", "chemistry"]
+    },
+    {
+      "id": "q022",
+      "query": "Which planet is closest to the Sun?",
+      "category": "fact",
+      "description": "Simple fact query",
+      "expected_topics": ["Mercury", "solar system"],
+      "difficulty": "easy",
+      "tags": ["astronomy", "planets"]
+    },
+    {
+      "id": "q023",
+      "query": "How many continents are there on Earth?",
+      "category": "fact",
+      "description": "Simple fact query",
+      "expected_topics": ["seven continents"],
+      "difficulty": "easy",
+      "tags": ["geography"]
+    },
+    {
+      "id": "q024",
+      "query": "What is the capital of Canada?",
+      "category": "fact",
+      "description": "Simple fact query",
+      "expected_topics": ["Ottawa", "Canada"],
+      "difficulty": "easy",
+      "tags": ["geography", "capital"]
+    },
+    {
+      "id": "q025",
+      "query": "In what year did the World Wide Web become publicly available?",
+      "category": "fact",
+      "description": "Simple fact query",
+      "expected_topics": ["1991", "Tim Berners-Lee", "CERN"],
+      "difficulty": "medium",
+      "tags": ["history", "internet"]
+    },
+    {
+      "id": "q026",
+      "query": "What is the approximate speed of light in vacuum?",
+      "category": "fact",
+      "description": "Simple fact query",
+      "expected_topics": ["3e8 m/s", "speed of light", "vacuum"],
+      "difficulty": "easy",
+      "tags": ["physics", "constants"]
+    },
+    {
+      "id": "q027",
+      "query": "Which element has atomic number 8?",
+      "category": "fact",
+      "description": "Simple fact query",
+      "expected_topics": ["oxygen", "periodic table"],
+      "difficulty": "easy",
+      "tags": ["chemistry", "elements"]
+    },
+    {
+      "id": "q028",
+      "query": "What is the longest river in Africa?",
+      "category": "fact",
+      "description": "Simple fact query",
+      "expected_topics": ["Nile", "Africa"],
+      "difficulty": "easy",
+      "tags": ["geography", "rivers"]
+    },
+    {
+      "id": "q029",
+      "query": "What is the tallest mountain in North America?",
+      "category": "fact",
+      "description": "Simple fact query",
+      "expected_topics": ["Denali", "Alaska", "mountain"],
+      "difficulty": "easy",
+      "tags": ["geography", "mountains"]
+    },
+    {
+      "id": "q030",
+      "query": "Which organization awards the Nobel Prizes?",
+      "category": "fact",
+      "description": "Simple fact query",
+      "expected_topics": ["Nobel Foundation", "Nobel Prize"],
+      "difficulty": "easy",
+      "tags": ["awards", "history"]
+    },
+    {
+      "id": "q031",
+      "query": "Create a 4-week beginner plan to learn Python.",
+      "category": "plan",
+      "description": "Planning request",
+      "expected_topics": ["basics", "practice exercises", "projects", "schedule"],
+      "difficulty": "medium",
+      "tags": ["learning plan", "Python"]
+    },
+    {
+      "id": "q032",
+      "query": "Design a 6-week plan to improve spoken English.",
+      "category": "plan",
+      "description": "Planning request",
+      "expected_topics": ["speaking practice", "listening", "pronunciation", "feedback"],
+      "difficulty": "medium",
+      "tags": ["language", "English"]
+    },
+    {
+      "id": "q033",
+      "query": "Outline a 3-month plan to train for a 10K run.",
+      "category": "plan",
+      "description": "Planning request",
+      "expected_topics": ["progressive mileage", "rest days", "long run", "pace"],
+      "difficulty": "medium",
+      "tags": ["fitness", "running"]
+    },
+    {
+      "id": "q034",
+      "query": "Provide a 30-day personal budgeting plan.",
+      "category": "plan",
+      "description": "Planning request",
+      "expected_topics": ["income", "expense categories", "savings", "tracking"],
+      "difficulty": "easy",
+      "tags": ["finance", "budgeting"]
+    },
+    {
+      "id": "q035",
+      "query": "Create a 5-day itinerary for a first-time trip to Tokyo.",
+      "category": "plan",
+      "description": "Planning request",
+      "expected_topics": ["sightseeing", "transportation", "food", "time planning"],
+      "difficulty": "easy",
+      "tags": ["travel", "Tokyo"]
+    },
+    {
+      "id": "q036",
+      "query": "Propose a 90-day onboarding plan for a new product manager.",
+      "category": "plan",
+      "description": "Planning request",
+      "expected_topics": ["stakeholders", "roadmap", "metrics", "team alignment"],
+      "difficulty": "medium",
+      "tags": ["product", "onboarding"]
+    },
+    {
+      "id": "q037",
+      "query": "Develop a 2-week plan to declutter a small apartment.",
+      "category": "plan",
+      "description": "Planning request",
+      "expected_topics": ["rooms", "sorting", "donate", "schedule"],
+      "difficulty": "easy",
+      "tags": ["home", "organization"]
+    },
+    {
+      "id": "q038",
+      "query": "Outline a semester study plan for Data Structures and Algorithms.",
+      "category": "plan",
+      "description": "Planning request",
+      "expected_topics": ["weekly topics", "practice problems", "revision", "exams"],
+      "difficulty": "medium",
+      "tags": ["study plan", "DSA"]
+    },
+    {
+      "id": "q039",
+      "query": "Create a launch plan for a new mobile app.",
+      "category": "plan",
+      "description": "Planning request",
+      "expected_topics": ["market research", "beta testing", "marketing", "KPIs"],
+      "difficulty": "medium",
+      "tags": ["product launch", "mobile"]
+    },
+    {
+      "id": "q040",
+      "query": "Provide a weekly meal-prep plan for healthy eating.",
+      "category": "plan",
+      "description": "Planning request",
+      "expected_topics": ["grocery list", "macros", "batch cooking", "schedule"],
+      "difficulty": "easy",
+      "tags": ["health", "nutrition"]
+    },
+    {
+      "id": "q041",
+      "query": "Give examples of renewable energy sources.",
+      "category": "example",
+      "description": "Example request",
+      "expected_topics": ["solar", "wind", "hydro", "geothermal", "biomass"],
+      "difficulty": "easy",
+      "tags": ["energy", "renewables"]
+    },
+    {
+      "id": "q042",
+      "query": "Provide examples of common design patterns in software.",
+      "category": "example",
+      "description": "Example request",
+      "expected_topics": ["singleton", "factory", "observer", "strategy", "decorator"],
+      "difficulty": "easy",
+      "tags": ["software engineering", "patterns"]
+    },
+    {
+      "id": "q043",
+      "query": "Give examples of supervised learning algorithms.",
+      "category": "example",
+      "description": "Example request",
+      "expected_topics": ["linear regression", "random forest", "SVM", "gradient boosting"],
+      "difficulty": "easy",
+      "tags": ["machine learning", "supervised"]
+    },
+    {
+      "id": "q044",
+      "query": "Provide examples of data visualization charts.",
+      "category": "example",
+      "description": "Example request",
+      "expected_topics": ["line chart", "bar chart", "scatter plot", "pie chart", "heatmap"],
+      "difficulty": "easy",
+      "tags": ["data viz", "charts"]
+    },
+    {
+      "id": "q045",
+      "query": "Give examples of cybersecurity threats.",
+      "category": "example",
+      "description": "Example request",
+      "expected_topics": ["phishing", "malware", "DDoS", "SQL injection"],
+      "difficulty": "easy",
+      "tags": ["security", "cyber"]
+    },
+    {
+      "id": "q046",
+      "query": "Provide examples of non-functional requirements.",
+      "category": "example",
+      "description": "Example request",
+      "expected_topics": ["performance", "availability", "security", "scalability"],
+      "difficulty": "easy",
+      "tags": ["requirements", "software"]
+    },
+    {
+      "id": "q047",
+      "query": "Give examples of public transportation modes.",
+      "category": "example",
+      "description": "Example request",
+      "expected_topics": ["subway", "bus", "tram", "ferry", "bike share"],
+      "difficulty": "easy",
+      "tags": ["transport", "public transit"]
+    },
+    {
+      "id": "q048",
+      "query": "Provide examples of cloud storage services.",
+      "category": "example",
+      "description": "Example request",
+      "expected_topics": ["Amazon S3", "Google Cloud Storage", "Azure Blob Storage", "Dropbox"],
+      "difficulty": "easy",
+      "tags": ["cloud", "storage"]
+    },
+    {
+      "id": "q049",
+      "query": "Give examples of persuasive writing techniques.",
+      "category": "example",
+      "description": "Example request",
+      "expected_topics": ["ethos", "pathos", "logos", "call to action"],
+      "difficulty": "easy",
+      "tags": ["writing", "rhetoric"]
+    },
+    {
+      "id": "q050",
+      "query": "Provide examples of IoT devices.",
+      "category": "example",
+      "description": "Example request",
+      "expected_topics": ["smart thermostat", "smart speaker", "wearable", "smart light"],
+      "difficulty": "easy",
+      "tags": ["IoT", "devices"]
+    }
+  ]
+}

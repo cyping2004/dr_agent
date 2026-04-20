@@ -1,0 +1,458 @@
+{
+  "dataset_name": "zh_50",
+  "version": "1.0",
+  "description": "Chinese query set (50 queries, 5 categories x 10 each)",
+  "created_at": "2026-04-13T00:00:00Z",
+  "queries": [
+    {
+      "id": "q001",
+      "query": "什么是量子纠缠？",
+      "category": "definition",
+      "description": "Concept definition query",
+      "expected_topics": ["量子纠缠", "量子力学", "纠缠态", "贝尔不等式"],
+      "difficulty": "medium",
+      "tags": ["物理", "量子"]
+    },
+    {
+      "id": "q002",
+      "query": "什么是碳中和？",
+      "category": "definition",
+      "description": "Concept definition query",
+      "expected_topics": ["碳中和", "温室气体", "碳排放", "减排与抵消"],
+      "difficulty": "easy",
+      "tags": ["环境", "气候"]
+    },
+    {
+      "id": "q003",
+      "query": "什么是边缘计算？",
+      "category": "definition",
+      "description": "Concept definition query",
+      "expected_topics": ["边缘计算", "低延迟", "物联网", "云计算"],
+      "difficulty": "medium",
+      "tags": ["计算", "物联网"]
+    },
+    {
+      "id": "q004",
+      "query": "什么是通货膨胀？",
+      "category": "definition",
+      "description": "Concept definition query",
+      "expected_topics": ["通货膨胀", "物价水平", "CPI", "货币政策"],
+      "difficulty": "easy",
+      "tags": ["经济", "宏观"]
+    },
+    {
+      "id": "q005",
+      "query": "什么是全息投影？",
+      "category": "definition",
+      "description": "Concept definition query",
+      "expected_topics": ["全息投影", "光学", "干涉", "三维成像"],
+      "difficulty": "medium",
+      "tags": ["光学", "成像"]
+    },
+    {
+      "id": "q006",
+      "query": "什么是开源许可证中的 MIT 许可？",
+      "category": "definition",
+      "description": "Concept definition query",
+      "expected_topics": ["MIT 许可", "开源协议", "授权条件", "版权声明"],
+      "difficulty": "easy",
+      "tags": ["开源", "许可证"]
+    },
+    {
+      "id": "q007",
+      "query": "什么是区块链共识机制？",
+      "category": "definition",
+      "description": "Concept definition query",
+      "expected_topics": ["区块链", "共识机制", "PoW", "PoS", "拜占庭容错"],
+      "difficulty": "medium",
+      "tags": ["区块链", "共识"]
+    },
+    {
+      "id": "q008",
+      "query": "什么是生态系统服务？",
+      "category": "definition",
+      "description": "Concept definition query",
+      "expected_topics": ["生态系统服务", "供给服务", "调节服务", "文化服务"],
+      "difficulty": "medium",
+      "tags": ["生态", "环境"]
+    },
+    {
+      "id": "q009",
+      "query": "什么是非遗（非物质文化遗产）？",
+      "category": "definition",
+      "description": "Concept definition query",
+      "expected_topics": ["非物质文化遗产", "传统文化", "保护", "申遗"],
+      "difficulty": "easy",
+      "tags": ["文化", "遗产"]
+    },
+    {
+      "id": "q010",
+      "query": "什么是强化学习？",
+      "category": "definition",
+      "description": "Concept definition query",
+      "expected_topics": ["强化学习", "智能体", "奖励", "策略", "马尔可夫决策过程"],
+      "difficulty": "medium",
+      "tags": ["机器学习", "AI"]
+    },
+    {
+      "id": "q011",
+      "query": "比较机器学习和深度学习的主要区别",
+      "category": "comparison",
+      "description": "Comparison query",
+      "expected_topics": ["特征工程", "神经网络", "数据规模", "模型复杂度"],
+      "difficulty": "medium",
+      "tags": ["机器学习", "深度学习", "对比"]
+    },
+    {
+      "id": "q012",
+      "query": "比较太阳能发电与风能发电的优缺点",
+      "category": "comparison",
+      "description": "Comparison query",
+      "expected_topics": ["可再生能源", "发电效率", "成本", "间歇性"],
+      "difficulty": "medium",
+      "tags": ["能源", "太阳能", "风能"]
+    },
+    {
+      "id": "q013",
+      "query": "比较 TCP 和 UDP 的差异",
+      "category": "comparison",
+      "description": "Comparison query",
+      "expected_topics": ["传输层", "可靠性", "连接", "延迟", "协议"],
+      "difficulty": "easy",
+      "tags": ["网络", "TCP", "UDP"]
+    },
+    {
+      "id": "q014",
+      "query": "比较单体架构与微服务架构",
+      "category": "comparison",
+      "description": "Comparison query",
+      "expected_topics": ["部署", "可扩展性", "复杂度", "服务拆分"],
+      "difficulty": "medium",
+      "tags": ["软件架构", "单体", "微服务"]
+    },
+    {
+      "id": "q015",
+      "query": "比较 iOS 与 Android 的生态与开发差异",
+      "category": "comparison",
+      "description": "Comparison query",
+      "expected_topics": ["应用商店", "开发语言", "设备碎片化", "系统权限"],
+      "difficulty": "medium",
+      "tags": ["移动开发", "iOS", "Android"]
+    },
+    {
+      "id": "q016",
+      "query": "比较电子书与纸质书的阅读体验",
+      "category": "comparison",
+      "description": "Comparison query",
+      "expected_topics": ["可携带性", "护眼", "成本", "收藏"],
+      "difficulty": "easy",
+      "tags": ["阅读", "电子书", "纸质书"]
+    },
+    {
+      "id": "q017",
+      "query": "比较公路运输与铁路运输的成本和适用场景",
+      "category": "comparison",
+      "description": "Comparison query",
+      "expected_topics": ["运输成本", "时效", "货运", "里程"],
+      "difficulty": "medium",
+      "tags": ["物流", "运输", "公路", "铁路"]
+    },
+    {
+      "id": "q018",
+      "query": "比较股票与债券的风险收益特征",
+      "category": "comparison",
+      "description": "Comparison query",
+      "expected_topics": ["风险", "收益", "波动", "固定收益"],
+      "difficulty": "medium",
+      "tags": ["金融", "股票", "债券"]
+    },
+    {
+      "id": "q019",
+      "query": "比较有氧运动与无氧运动的效果",
+      "category": "comparison",
+      "description": "Comparison query",
+      "expected_topics": ["心肺功能", "肌肉力量", "能量消耗", "训练方式"],
+      "difficulty": "easy",
+      "tags": ["运动", "有氧", "无氧"]
+    },
+    {
+      "id": "q020",
+      "query": "比较云存储和本地存储的优缺点",
+      "category": "comparison",
+      "description": "Comparison query",
+      "expected_topics": ["安全性", "成本", "可用性", "延迟", "备份"],
+      "difficulty": "medium",
+      "tags": ["存储", "云", "本地"]
+    },
+    {
+      "id": "q021",
+      "query": "中国的国土面积大约是多少平方公里？",
+      "category": "fact",
+      "description": "Simple fact query",
+      "expected_topics": ["国土面积", "中国", "平方公里"],
+      "difficulty": "easy",
+      "tags": ["地理", "中国", "面积"]
+    },
+    {
+      "id": "q022",
+      "query": "世界上最高的山峰是哪一座？",
+      "category": "fact",
+      "description": "Simple fact query",
+      "expected_topics": ["珠穆朗玛峰", "最高峰", "喜马拉雅"],
+      "difficulty": "easy",
+      "tags": ["地理", "山峰"]
+    },
+    {
+      "id": "q023",
+      "query": "水在标准大气压下的沸点是多少摄氏度？",
+      "category": "fact",
+      "description": "Simple fact query",
+      "expected_topics": ["沸点", "水", "100摄氏度", "标准大气压"],
+      "difficulty": "easy",
+      "tags": ["物理", "化学", "常识"]
+    },
+    {
+      "id": "q024",
+      "query": "地球到月球的平均距离是多少？",
+      "category": "fact",
+      "description": "Simple fact query",
+      "expected_topics": ["地月距离", "384400公里", "天文学"],
+      "difficulty": "easy",
+      "tags": ["天文", "地月"]
+    },
+    {
+      "id": "q025",
+      "query": "联合国成立于哪一年？",
+      "category": "fact",
+      "description": "Simple fact query",
+      "expected_topics": ["1945年", "联合国", "历史"],
+      "difficulty": "easy",
+      "tags": ["历史", "国际组织"]
+    },
+    {
+      "id": "q026",
+      "query": "光速在真空中的近似数值是多少？",
+      "category": "fact",
+      "description": "Simple fact query",
+      "expected_topics": ["光速", "3e8 m/s", "真空"],
+      "difficulty": "easy",
+      "tags": ["物理", "常数"]
+    },
+    {
+      "id": "q027",
+      "query": "亚马逊河流经哪些国家？",
+      "category": "fact",
+      "description": "Simple fact query",
+      "expected_topics": ["巴西", "秘鲁", "哥伦比亚", "亚马逊河"],
+      "difficulty": "easy",
+      "tags": ["地理", "南美"]
+    },
+    {
+      "id": "q028",
+      "query": "元素周期表中原子序数为 6 的元素是什么？",
+      "category": "fact",
+      "description": "Simple fact query",
+      "expected_topics": ["碳", "原子序数", "元素周期表"],
+      "difficulty": "easy",
+      "tags": ["化学", "元素"]
+    },
+    {
+      "id": "q029",
+      "query": "人类 DNA 中常见的四种碱基是什么？",
+      "category": "fact",
+      "description": "Simple fact query",
+      "expected_topics": ["腺嘌呤A", "胸腺嘧啶T", "胞嘧啶C", "鸟嘌呤G"],
+      "difficulty": "easy",
+      "tags": ["生物", "DNA"]
+    },
+    {
+      "id": "q030",
+      "query": "联合国安理会常任理事国有哪些？",
+      "category": "fact",
+      "description": "Simple fact query",
+      "expected_topics": ["中国", "法国", "俄罗斯", "英国", "美国", "安理会常任理事国"],
+      "difficulty": "easy",
+      "tags": ["国际政治", "联合国"]
+    },
+    {
+      "id": "q031",
+      "query": "请给出一份为期两周的 Python 入门学习计划",
+      "category": "plan",
+      "description": "Planning request",
+      "expected_topics": ["基础语法", "数据类型", "控制流", "练习项目"],
+      "difficulty": "medium",
+      "tags": ["学习计划", "Python"]
+    },
+    {
+      "id": "q032",
+      "query": "制定一个三个月的跑步训练计划，目标是完成 10 公里",
+      "category": "plan",
+      "description": "Planning request",
+      "expected_topics": ["循序渐进", "周训练量", "心肺", "休息日"],
+      "difficulty": "medium",
+      "tags": ["健身", "跑步", "计划"]
+    },
+    {
+      "id": "q033",
+      "query": "给一个初创团队的产品冷启动推广计划",
+      "category": "plan",
+      "description": "Planning request",
+      "expected_topics": ["目标用户", "渠道", "试用", "反馈", "增长"],
+      "difficulty": "medium",
+      "tags": ["产品", "市场", "推广"]
+    },
+    {
+      "id": "q034",
+      "query": "制定家庭月度预算管理计划",
+      "category": "plan",
+      "description": "Planning request",
+      "expected_topics": ["收入", "支出分类", "储蓄", "应急基金"],
+      "difficulty": "easy",
+      "tags": ["理财", "预算"]
+    },
+    {
+      "id": "q035",
+      "query": "给出一个从零开始准备研究生入学考试的 6 个月学习计划",
+      "category": "plan",
+      "description": "Planning request",
+      "expected_topics": ["阶段目标", "科目安排", "复习节奏", "模拟考试"],
+      "difficulty": "medium",
+      "tags": ["学习计划", "考试"]
+    },
+    {
+      "id": "q036",
+      "query": "制定一次 5 天的北京文化旅行计划",
+      "category": "plan",
+      "description": "Planning request",
+      "expected_topics": ["景点安排", "交通", "饮食", "时间规划"],
+      "difficulty": "easy",
+      "tags": ["旅行", "北京"]
+    },
+    {
+      "id": "q037",
+      "query": "给出一个提高英语口语的 8 周训练计划",
+      "category": "plan",
+      "description": "Planning request",
+      "expected_topics": ["听说练习", "日常对话", "影子跟读", "口语输出"],
+      "difficulty": "medium",
+      "tags": ["英语", "口语", "训练"]
+    },
+    {
+      "id": "q038",
+      "query": "制定企业迁移到云端的实施计划",
+      "category": "plan",
+      "description": "Planning request",
+      "expected_topics": ["评估", "迁移策略", "安全", "成本", "阶段实施"],
+      "difficulty": "medium",
+      "tags": ["云计算", "IT", "迁移"]
+    },
+    {
+      "id": "q039",
+      "query": "制定一个健康饮食与作息调整的 30 天计划",
+      "category": "plan",
+      "description": "Planning request",
+      "expected_topics": ["饮食结构", "睡眠", "运动", "习惯养成"],
+      "difficulty": "easy",
+      "tags": ["健康", "生活方式"]
+    },
+    {
+      "id": "q040",
+      "query": "给一个新任项目经理的前 30 天工作计划",
+      "category": "plan",
+      "description": "Planning request",
+      "expected_topics": ["干系人沟通", "风险识别", "里程碑", "团队管理"],
+      "difficulty": "medium",
+      "tags": ["项目管理", "入职"]
+    },
+    {
+      "id": "q041",
+      "query": "请举例说明常见的无监督学习算法",
+      "category": "example",
+      "description": "Example request",
+      "expected_topics": ["K-means", "层次聚类", "DBSCAN", "PCA"],
+      "difficulty": "easy",
+      "tags": ["机器学习", "无监督"]
+    },
+    {
+      "id": "q042",
+      "query": "给出几种可再生能源的例子",
+      "category": "example",
+      "description": "Example request",
+      "expected_topics": ["太阳能", "风能", "水能", "地热", "生物质"],
+      "difficulty": "easy",
+      "tags": ["能源", "可再生"]
+    },
+    {
+      "id": "q043",
+      "query": "举例说明软件设计中的设计模式",
+      "category": "example",
+      "description": "Example request",
+      "expected_topics": ["单例", "工厂", "观察者", "策略", "装饰器"],
+      "difficulty": "easy",
+      "tags": ["软件工程", "设计模式"]
+    },
+    {
+      "id": "q044",
+      "query": "给出几种数据可视化图表的例子",
+      "category": "example",
+      "description": "Example request",
+      "expected_topics": ["折线图", "柱状图", "散点图", "饼图", "热力图"],
+      "difficulty": "easy",
+      "tags": ["数据可视化", "图表"]
+    },
+    {
+      "id": "q045",
+      "query": "举例说明常见的网络安全攻击类型",
+      "category": "example",
+      "description": "Example request",
+      "expected_topics": ["钓鱼", "SQL 注入", "DDoS", "恶意软件"],
+      "difficulty": "easy",
+      "tags": ["安全", "网络攻击"]
+    },
+    {
+      "id": "q046",
+      "query": "给出一些适合儿童的科学实验例子",
+      "category": "example",
+      "description": "Example request",
+      "expected_topics": ["火山实验", "彩虹瓶", "浮沉子", "静电"],
+      "difficulty": "easy",
+      "tags": ["科学", "教育", "儿童"]
+    },
+    {
+      "id": "q047",
+      "query": "举例说明城市公共交通方式",
+      "category": "example",
+      "description": "Example request",
+      "expected_topics": ["地铁", "公交", "有轨电车", "渡轮", "共享单车"],
+      "difficulty": "easy",
+      "tags": ["城市", "交通"]
+    },
+    {
+      "id": "q048",
+      "query": "给出几种常用的云服务产品或平台例子",
+      "category": "example",
+      "description": "Example request",
+      "expected_topics": ["AWS", "Azure", "Google Cloud", "阿里云", "腾讯云"],
+      "difficulty": "easy",
+      "tags": ["云服务", "平台"]
+    },
+    {
+      "id": "q049",
+      "query": "举例说明文学中的叙事视角类型",
+      "category": "example",
+      "description": "Example request",
+      "expected_topics": ["第一人称", "第三人称", "全知视角", "限制视角"],
+      "difficulty": "easy",
+      "tags": ["文学", "写作"]
+    },
+    {
+      "id": "q050",
+      "query": "给出几种常见的敏捷开发实践例子",
+      "category": "example",
+      "description": "Example request",
+      "expected_topics": ["Scrum", "看板", "站会", "迭代", "回顾"],
+      "difficulty": "easy",
+      "tags": ["敏捷", "软件开发"]
+    }
+  ]
+}

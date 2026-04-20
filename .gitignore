@@ -6,3 +6,4 @@ results/
 .env
 .DS_Store
 chroma_db/
+prompt.md

@@ -4,6 +4,7 @@
 """
 
 import os
+import re
 from typing import List, Dict, Optional
 
 from langchain_openai import ChatOpenAI
@@ -28,7 +29,11 @@ SYSTEM_PROMPT = """你是一名专业的研究报告撰写者。
 写作要求：
 1. 使用 Markdown 格式
 2. 保持客观性和准确性
-3. 语言简洁专业，尽可能多地描述你所知道的事实"""
+3. 语言简洁专业，尽可能多地描述你所知道的事实
+4. 只输出报告正文，不要任何前言、寒暄、角色说明或解释
+5. 必须以标题行开头，且只使用指定的报告结构
+6. 引用事实时使用 [n] 标注，n 对应证据列表序号
+7. 标题编号格式必须与模板一致"""
 
 
 def write(state: ResearchState) -> ResearchState:
@@ -74,7 +79,15 @@ def write(state: ResearchState) -> ResearchState:
 
     response = llm.invoke(messages)
 
-    state.report_draft = response.content.strip()
+    report = _sanitize_report_text(response.content)
+    report = _strip_reference_section(report)
+    references, evidence_ref_map = _collect_references(state.retrieved_evidence)
+    if evidence_ref_map:
+        report = _remap_citations(report, evidence_ref_map)
+    references_section = _build_reference_section(references)
+    if references_section:
+        report = f"{report}\n\n{references_section}"
+    state.report_draft = report
 
     return state
 
@@ -135,10 +148,13 @@ def _evidence_item_to_text(
     """
     if isinstance(evidence_item, Document):
         url = (evidence_item.metadata or {}).get("url", "")
+        title = (evidence_item.metadata or {}).get("title", "")
         source = (evidence_item.metadata or {}).get("source", "")
         header_parts = []
         if source:
             header_parts.append(f"来源: {source}")
+        if title:
+            header_parts.append(f"标题: {title}")
         if url:
             header_parts.append(f"URL: {url}")
         header = " | ".join(header_parts)
@@ -207,10 +223,121 @@ def _build_writer_prompt(query: str, evidence_text: str) -> str:
     Returns:
         提示词字符串。
     """
-    prompt = f"""# 深度研究报告: {query}
+    prompt = f"""请严格按以下格式输出，不要任何前言或解释：
+# 深度研究报告：{query}
 
+## 1. 执行摘要
+
+## 2. 关键发现
+（使用 2.1、2.2… 小标题组织关键发现）
+
+## 3. 结论
+
+## 4. 局限性与进一步研究
+
+要求：
+- 引用事实时使用 [n] 标注，n 对应证据列表序号，且从 1 开始
+- 不要生成“参考来源”列表，系统会自动添加
+
+证据如下：
 {evidence_text}
-
-请根据以上证据，撰写一份结构化的 Markdown 研究报告。"""
+"""
 
     return prompt
+
+
+def _sanitize_report_text(text: str) -> str:
+    """Strip any leading non-report text to keep a fixed report format."""
+    content = (text or "").strip()
+    if not content:
+        return content
+
+    lines = content.splitlines()
+    for idx, line in enumerate(lines):
+        if line.lstrip().startswith("#"):
+            return "\n".join(lines[idx:]).strip()
+
+    return content
+
+
+def _strip_reference_section(text: str) -> str:
+    """Remove any existing reference section to avoid duplicates."""
+    lines = (text or "").splitlines()
+    for idx, line in enumerate(lines):
+        stripped = line.strip()
+        if stripped in {"**参考来源**", "## 参考来源", "参考来源"}:
+            return "\n".join(lines[:idx]).rstrip()
+    return text
+
+
+def _collect_references(evidence: List[object]) -> tuple[List[Dict[str, str]], List[int]]:
+    """Collect unique references and map evidence indices to reference indices."""
+    references: List[Dict[str, str]] = []
+    key_to_index: Dict[str, int] = {}
+    evidence_ref_map: List[int] = []
+
+    for evidence_item in evidence:
+        if isinstance(evidence_item, Document):
+            metadata = evidence_item.metadata or {}
+            title = (metadata.get("title") or "").strip()
+            url = (metadata.get("url") or "").strip()
+        else:
+            title = ""
+            url = ""
+
+        key = _reference_key(title, url)
+        if key not in key_to_index:
+            key_to_index[key] = len(references) + 1
+            references.append({"title": title, "url": url})
+
+        evidence_ref_map.append(key_to_index[key])
+
+    return references, evidence_ref_map
+
+
+def _reference_key(title: str, url: str) -> str:
+    if url:
+        normalized = url.strip().rstrip("/")
+        return f"url:{normalized}"
+    if title:
+        return f"title:{title.strip().lower()}"
+    return "unknown"
+
+
+def _remap_citations(text: str, evidence_ref_map: List[int]) -> str:
+    """Remap [n] citations to the deduplicated reference indices."""
+    if not text or not evidence_ref_map:
+        return text
+
+    def replace(match: re.Match[str]) -> str:
+        raw = match.group(1)
+        try:
+            idx = int(raw)
+        except ValueError:
+            return match.group(0)
+        if 1 <= idx <= len(evidence_ref_map):
+            return f"[{evidence_ref_map[idx - 1]}]"
+        return match.group(0)
+
+    return re.sub(r"\[(\d+)\]", replace, text)
+
+
+def _build_reference_section(references: List[Dict[str, str]]) -> str:
+    """Build a reference list from unique metadata (title + url)."""
+    if not references:
+        return ""
+
+    lines = []
+    for idx, entry in enumerate(references, start=1):
+        title = (entry.get("title") or "").strip()
+        url = (entry.get("url") or "").strip()
+        if title and url:
+            lines.append(f"[{idx}] {title} ({url})")
+        elif url:
+            lines.append(f"[{idx}] {url}")
+        elif title:
+            lines.append(f"[{idx}] {title}")
+        else:
+            lines.append(f"[{idx}] 未命名来源")
+
+    return "**参考来源**\n\n" + "\n".join(lines)

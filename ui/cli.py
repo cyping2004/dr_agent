@@ -3,6 +3,7 @@ CLI 界面
 用于运行深度研究代理的命令行界面。
 """
 
+import hashlib
 import re
 import sys
 from pathlib import Path
@@ -102,7 +103,7 @@ def _resolve_output_path(query: str, output_path: str | None) -> Path:
     default_name = _default_report_name(query)
 
     if not output_path:
-        return Path(default_name)
+        return Path("reports") / default_name
 
     path = Path(output_path)
     if path.exists() and path.is_dir():
@@ -120,8 +121,13 @@ def _default_report_name(query: str) -> str:
     safe = re.sub(r"[^A-Za-z0-9_\-]+", "_", query.strip())
     safe = safe.strip("_")
     if not safe:
-        safe = "report"
+        safe = f"{_short_hash(query)}"
     return f"report_{safe[:30]}.md"
+
+
+def _short_hash(text: str) -> str:
+    """Generate a short, stable ASCII hash for non-ASCII queries."""
+    return hashlib.md5(text.encode("utf-8")).hexdigest()[:8]
 
 
 def main():

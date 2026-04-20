@@ -1,0 +1,129 @@
+{
+  "dataset_name": "retrieval_web_template_v1",
+  "version": "1.0",
+  "description": "Web-first retrieval evaluation template. Fill gold_urls for each query.",
+  "created_at": "2026-04-12T00:00:00Z",
+  "queries": [
+    {
+      "id": "q001",
+      "query": "What is the Transformer architecture?",
+      "gold_urls": [
+        "https://research.google/blog/transformer-a-novel-neural-network-architecture-for-language-understanding/",
+        "https://www.datacamp.com/tutorial/how-transformers-work",
+        "https://toloka.ai/blog/transformer-architecture/",
+        "https://www.ibm.com/think/topics/self-attention",
+        "https://www.machinelearningmastery.com/the-transformer-model/",
+        "https://www.geeksforgeeks.org/machine-learning/getting-started-with-transformers/"
+      ]
+    },
+    {
+      "id": "q002",
+      "query": "Who won the 2024 Nobel Prize in Physics?",
+      "gold_urls": [
+        "https://www.nobelprize.org/prizes/physics/2024/summary/",
+        "https://www.nobelprize.org/prizes/physics/2024/press-release/",
+        "https://www.kva.se/en/news/the-nobel-prize-in-physics-2024/",
+        "https://en.wikipedia.org/wiki/2024_Nobel_Prizes",
+        "https://physics.brown.edu/news/2024-10-08/2024-physics-nobel-prize",
+        "https://www.sciencenews.org/article/nobel-physics-2024-machine-learning"
+      ]
+    },
+    {
+      "id": "q003",
+      "query": "What are common data structures in Python?",
+      "gold_urls": [
+        "https://realpython.com/python-data-structures/",
+        "https://www.geeksforgeeks.org/python/inbuilt-data-structures-python/",
+        "https://www.codecademy.com/article/python-data-structures",
+        "https://jakevdp.github.io/WhirlwindTourOfPython/06-built-in-data-structures.html",
+        "https://mimo.org/glossary/python/data-structures",
+        "https://www.educative.io/blog/8-common-data-structures-in-python-every-programmer-must-know"
+      ]
+    },
+    {
+      "id": "q004",
+      "query": "What are the main differences between GPT-4 and Claude 3?",
+      "gold_urls": [
+        "https://www.anthropic.com/news/claude-3-family",
+        "https://www.techtarget.com/whatis/definition/GPT-4",
+        "https://newsletter.semianalysis.com/p/gpt-4-architecture-infrastructure",
+        "https://vellum.ai/blog/claude-3-opus-vs-gpt4-task-specific-analysis",
+        "https://www.proxet.com/blog/claude-3-vs-gpt-4-the-competitive-ai-landscape-weve-all-been-waiting-for",
+        "https://lobehub.com/blog/claude-3-vs-gpt-4"
+      ]
+    },
+    {
+      "id": "q005",
+      "query": "How does RAG (Retrieval-Augmented Generation) work?",
+      "gold_urls": [
+        "https://blogs.nvidia.com/blog/what-is-retrieval-augmented-generation/",
+        "https://www.ibm.com/think/topics/retrieval-augmented-generation",
+        "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+        "https://cloud.google.com/use-cases/retrieval-augmented-generation",
+        "https://humanloop.com/blog/rag-architectures",
+        "https://www.mckinsey.com/featured-insights/mckinsey-explainers/what-is-retrieval-augmented-generation-rag"
+      ]
+    },
+    {
+      "id": "q006",
+      "query": "Compare React and Vue.js pros and cons",
+      "gold_urls": [
+        "https://vuejs.org/v2/guide/comparison.html",
+        "https://alokai.com/blog/vue-vs-react",
+        "https://www.scalablepath.com/front-end/vue-vs-react",
+        "https://www.monterail.com/blog/is-vuejs-enterprise-ready",
+        "https://www.angularminds.com/blog/why-react-is-so-popular",
+        "https://studysection.com/blog/advantages-and-disadvantages-of-react-js/",
+        "https://www.altexsoft.com/blog/pros-and-cons-of-vue-js/"
+      ]
+    },
+    {
+      "id": "q007",
+      "query": "What are best practices for Docker containerization?",
+      "gold_urls": [
+        "https://www.docker.com/blog/reduce-your-image-size-with-the-dive-in-docker-extension/",
+        "https://www.sysdig.com/learn-cloud-native/dockerfile-best-practices",
+        "https://snyk.io/blog/10-docker-image-security-best-practices/",
+        "https://www.sentinelone.com/cybersecurity-101/cloud-security/docker-container-security-best-practices/",
+        "https://www.cloudbees.com/blog/reduce-docker-image-size",
+        "https://www.blacksmith.sh/blog/how-to-optimize-dockerfile-faster-docker-builds"
+      ]
+    },
+    {
+      "id": "q008",
+      "query": "What is a vector database? What are common vector databases?",
+      "gold_urls": [
+        "https://cloud.google.com/discover/what-is-a-vector-database",
+        "https://learn.microsoft.com/en-us/data-engineering/playbook/solutions/vector-database/",
+        "https://www.pinecone.io/learn/vector-database/",
+        "https://milvus.io/blog/what-is-a-vector-database.md",
+        "https://redis.io/blog/vector-databases-what-you-need-to-know/",
+        "https://www.intersystems.com/resources/what-are-vector-databases-and-how-do-they-work/"
+      ]
+    },
+    {
+      "id": "q009",
+      "query": "What are advantages and challenges of microservices architecture?",
+      "gold_urls": [
+        "https://www.atlassian.com/microservices/microservices-architecture/microservices-vs-monolith",
+        "https://aws.amazon.com/compare/the-difference-between-monolithic-and-microservices-architecture/",
+        "https://kitrum.com/blog/microservices-vs-monolithic-architecture/",
+        "https://www.port.io/blog/microservice-architecture",
+        "https://www.geeksforgeeks.org/system-design/challenges-and-solutions-of-microservices-architecture/",
+        "https://www.bmc.com/blogs/microservices-challenges-when-to-avoid/"
+      ]
+    },
+    {
+      "id": "q010",
+      "query": "What are the differences between Pod, Deployment, and Service in Kubernetes?",
+      "gold_urls": [
+        "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/",
+        "https://kubernetes.io/docs/concepts/workloads/pods/",
+        "https://devopscon.io/blog/demystifying-kubernetes-pods-deployments-and-services/",
+        "https://www.vcluster.com/blog/a-clear-and-complete-guide-to-kubernetes-services",
+        "https://www.redhat.com/en/topics/containers/what-is-kubernetes-pod",
+        "https://www.vmware.com/topics/kubernetes-pods"
+      ]
+    }
+  ]
+}

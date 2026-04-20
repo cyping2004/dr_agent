@@ -1,0 +1,315 @@
+{
+  "total_queries": 50,
+  "creation_date": "2026-04-13T09:30:27.577730",
+  "queries": {
+    "q001": {
+      "query": "什么是量子纠缠？",
+      "num_tasks": 6,
+      "num_documents": 57,
+      "timestamp": "2026-04-13T10:31:13.045512"
+    },
+    "q002": {
+      "query": "什么是碳中和？",
+      "num_tasks": 6,
+      "num_documents": 57,
+      "timestamp": "2026-04-13T10:31:53.372692"
+    },
+    "q003": {
+      "query": "什么是边缘计算？",
+      "num_tasks": 6,
+      "num_documents": 57,
+      "timestamp": "2026-04-13T10:32:32.274660"
+    },
+    "q004": {
+      "query": "什么是通货膨胀？",
+      "num_tasks": 6,
+      "num_documents": 60,
+      "timestamp": "2026-04-13T10:33:06.625607"
+    },
+    "q005": {
+      "query": "什么是全息投影？",
+      "num_tasks": 6,
+      "num_documents": 57,
+      "timestamp": "2026-04-13T10:33:37.561955"
+    },
+    "q006": {
+      "query": "什么是开源许可证中的 MIT 许可？",
+      "num_tasks": 12,
+      "num_documents": 119,
+      "timestamp": "2026-04-13T10:34:58.425831"
+    },
+    "q007": {
+      "query": "什么是区块链共识机制？",
+      "num_tasks": 6,
+      "num_documents": 59,
+      "timestamp": "2026-04-13T10:35:36.766611"
+    },
+    "q008": {
+      "query": "什么是生态系统服务？",
+      "num_tasks": 10,
+      "num_documents": 99,
+      "timestamp": "2026-04-13T10:36:52.039235"
+    },
+    "q009": {
+      "query": "什么是非遗（非物质文化遗产）？",
+      "num_tasks": 6,
+      "num_documents": 56,
+      "timestamp": "2026-04-13T10:37:25.562647"
+    },
+    "q010": {
+      "query": "什么是强化学习？",
+      "num_tasks": 6,
+      "num_documents": 57,
+      "timestamp": "2026-04-13T10:38:03.378072"
+    },
+    "q011": {
+      "query": "比较机器学习和深度学习的主要区别",
+      "num_tasks": 7,
+      "num_documents": 70,
+      "timestamp": "2026-04-13T10:38:43.008184"
+    },
+    "q012": {
+      "query": "比较太阳能发电与风能发电的优缺点",
+      "num_tasks": 7,
+      "num_documents": 67,
+      "timestamp": "2026-04-13T10:39:19.250339"
+    },
+    "q013": {
+      "query": "比较 TCP 和 UDP 的差异",
+      "num_tasks": 5,
+      "num_documents": 46,
+      "timestamp": "2026-04-13T10:39:51.097057"
+    },
+    "q014": {
+      "query": "比较单体架构与微服务架构",
+      "num_tasks": 7,
+      "num_documents": 67,
+      "timestamp": "2026-04-13T10:40:36.475051"
+    },
+    "q015": {
+      "query": "比较 iOS 与 Android 的生态与开发差异",
+      "num_tasks": 7,
+      "num_documents": 69,
+      "timestamp": "2026-04-13T10:41:27.422780"
+    },
+    "q016": {
+      "query": "比较电子书与纸质书的阅读体验",
+      "num_tasks": 6,
+      "num_documents": 60,
+      "timestamp": "2026-04-13T10:42:00.924174"
+    },
+    "q017": {
+      "query": "比较公路运输与铁路运输的成本和适用场景",
+      "num_tasks": 7,
+      "num_documents": 70,
+      "timestamp": "2026-04-13T10:42:51.106041"
+    },
+    "q018": {
+      "query": "比较股票与债券的风险收益特征",
+      "num_tasks": 7,
+      "num_documents": 69,
+      "timestamp": "2026-04-13T10:43:36.433282"
+    },
+    "q019": {
+      "query": "比较有氧运动与无氧运动的效果",
+      "num_tasks": 7,
+      "num_documents": 68,
+      "timestamp": "2026-04-13T10:44:21.527844"
+    },
+    "q020": {
+      "query": "比较云存储和本地存储的优缺点",
+      "num_tasks": 14,
+      "num_documents": 137,
+      "timestamp": "2026-04-13T10:45:55.422213"
+    },
+    "q021": {
+      "query": "中国的国土面积大约是多少平方公里？",
+      "num_tasks": 5,
+      "num_documents": 46,
+      "timestamp": "2026-04-13T10:46:27.583701"
+    },
+    "q022": {
+      "query": "世界上最高的山峰是哪一座？",
+      "num_tasks": 5,
+      "num_documents": 47,
+      "timestamp": "2026-04-13T10:46:55.425627"
+    },
+    "q023": {
+      "query": "水在标准大气压下的沸点是多少摄氏度？",
+      "num_tasks": 3,
+      "num_documents": 27,
+      "timestamp": "2026-04-13T10:47:15.568928"
+    },
+    "q024": {
+      "query": "地球到月球的平均距离是多少？",
+      "num_tasks": 5,
+      "num_documents": 46,
+      "timestamp": "2026-04-13T10:47:46.367134"
+    },
+    "q025": {
+      "query": "联合国成立于哪一年？",
+      "num_tasks": 5,
+      "num_documents": 47,
+      "timestamp": "2026-04-13T10:48:16.886121"
+    },
+    "q026": {
+      "query": "光速在真空中的近似数值是多少？",
+      "num_tasks": 5,
+      "num_documents": 47,
+      "timestamp": "2026-04-13T10:48:46.034018"
+    },
+    "q027": {
+      "query": "亚马逊河流经哪些国家？",
+      "num_tasks": 5,
+      "num_documents": 47,
+      "timestamp": "2026-04-13T10:49:17.662487"
+    },
+    "q028": {
+      "query": "元素周期表中原子序数为 6 的元素是什么？",
+      "num_tasks": 5,
+      "num_documents": 49,
+      "timestamp": "2026-04-13T10:49:53.826536"
+    },
+    "q029": {
+      "query": "人类 DNA 中常见的四种碱基是什么？",
+      "num_tasks": 4,
+      "num_documents": 37,
+      "timestamp": "2026-04-13T10:50:14.350100"
+    },
+    "q030": {
+      "query": "联合国安理会常任理事国有哪些？",
+      "num_tasks": 5,
+      "num_documents": 48,
+      "timestamp": "2026-04-13T10:50:46.097460"
+    },
+    "q031": {
+      "query": "请给出一份为期两周的 Python 入门学习计划",
+      "num_tasks": 7,
+      "num_documents": 68,
+      "timestamp": "2026-04-13T10:51:31.784989"
+    },
+    "q032": {
+      "query": "制定一个三个月的跑步训练计划，目标是完成 10 公里",
+      "num_tasks": 7,
+      "num_documents": 70,
+      "timestamp": "2026-04-13T10:52:16.355887"
+    },
+    "q033": {
+      "query": "给一个初创团队的产品冷启动推广计划",
+      "num_tasks": 7,
+      "num_documents": 69,
+      "timestamp": "2026-04-13T10:53:00.729756"
+    },
+    "q034": {
+      "query": "制定家庭月度预算管理计划",
+      "num_tasks": 7,
+      "num_documents": 70,
+      "timestamp": "2026-04-13T10:53:41.684913"
+    },
+    "q035": {
+      "query": "给出一个从零开始准备研究生入学考试的 6 个月学习计划",
+      "num_tasks": 7,
+      "num_documents": 69,
+      "timestamp": "2026-04-13T10:54:22.350225"
+    },
+    "q036": {
+      "query": "制定一次 5 天的北京文化旅行计划",
+      "num_tasks": 7,
+      "num_documents": 70,
+      "timestamp": "2026-04-13T10:55:07.391996"
+    },
+    "q037": {
+      "query": "给出一个提高英语口语的 8 周训练计划",
+      "num_tasks": 14,
+      "num_documents": 131,
+      "timestamp": "2026-04-13T10:56:46.177899"
+    },
+    "q038": {
+      "query": "制定企业迁移到云端的实施计划",
+      "num_tasks": 7,
+      "num_documents": 68,
+      "timestamp": "2026-04-13T10:57:31.875737"
+    },
+    "q039": {
+      "query": "制定一个健康饮食与作息调整的 30 天计划",
+      "num_tasks": 7,
+      "num_documents": 69,
+      "timestamp": "2026-04-13T10:58:16.227842"
+    },
+    "q040": {
+      "query": "给一个新任项目经理的前 30 天工作计划",
+      "num_tasks": 7,
+      "num_documents": 64,
+      "timestamp": "2026-04-13T10:59:11.872755"
+    },
+    "q041": {
+      "query": "请举例说明常见的无监督学习算法",
+      "num_tasks": 7,
+      "num_documents": 70,
+      "timestamp": "2026-04-13T10:59:58.346012"
+    },
+    "q042": {
+      "query": "给出几种可再生能源的例子",
+      "num_tasks": 7,
+      "num_documents": 68,
+      "timestamp": "2026-04-13T11:00:46.842300"
+    },
+    "q043": {
+      "query": "举例说明软件设计中的设计模式",
+      "num_tasks": 7,
+      "num_documents": 70,
+      "timestamp": "2026-04-13T11:01:36.979810"
+    },
+    "q044": {
+      "query": "给出几种数据可视化图表的例子",
+      "num_tasks": 6,
+      "num_documents": 59,
+      "timestamp": "2026-04-13T11:02:21.517248"
+    },
+    "q045": {
+      "query": "举例说明常见的网络安全攻击类型",
+      "num_tasks": 7,
+      "num_documents": 70,
+      "timestamp": "2026-04-13T11:03:09.477992"
+    },
+    "q046": {
+      "query": "给出一些适合儿童的科学实验例子",
+      "num_tasks": 7,
+      "num_documents": 69,
+      "timestamp": "2026-04-13T11:03:54.114552"
+    },
+    "q047": {
+      "query": "举例说明城市公共交通方式",
+      "num_tasks": 7,
+      "num_documents": 70,
+      "timestamp": "2026-04-13T11:04:39.353213"
+    },
+    "q048": {
+      "query": "给出几种常用的云服务产品或平台例子",
+      "num_tasks": 7,
+      "num_documents": 67,
+      "timestamp": "2026-04-13T11:05:15.236105"
+    },
+    "q049": {
+      "query": "举例说明文学中的叙事视角类型",
+      "num_tasks": 7,
+      "num_documents": 68,
+      "timestamp": "2026-04-13T11:05:54.176527"
+    },
+    "q050": {
+      "query": "给出几种常见的敏捷开发实践例子",
+      "num_tasks": 7,
+      "num_documents": 70,
+      "timestamp": "2026-04-13T11:06:39.506451"
+    }
+  },
+  "last_updated": "2026-04-13T11:06:39.521980",
+  "run": {
+    "dataset": "eval/datasets/zh_50.json",
+    "provider": "tavily",
+    "total_queries": 50,
+    "successful": 50,
+    "skipped": 0,
+    "failed": 0
+  }
+}

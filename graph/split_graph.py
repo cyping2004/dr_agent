@@ -361,7 +361,7 @@ class SplitResearchGraph:
 
         for task in state.research_tasks:
             print(f"[Web Search] 搜索任务: {task}")
-            results = search(task, num_results=5)
+            results = search(task, num_results=10)
             all_docs.extend(results)
 
         state.retrieved_evidence = all_docs

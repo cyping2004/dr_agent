@@ -54,7 +54,7 @@ def plan(state: ResearchState) -> ResearchState:
 
 
 SYSTEM_PROMPT = """你是一个研究规划助理。
-你的任务是将用户的查询分解为 3–7 个具体的、可搜索的子问题。
+你的任务是将用户的查询分解为 5–7 个具体的、可搜索的子问题。
 
 要求：
 1. 每个子问题应该是独立的，能够通过搜索获得答案
@@ -78,7 +78,7 @@ def _build_planning_prompt(state: ResearchState) -> str:
 """
 
     prompt += """
-请将此查询分解为 3–7 个具体的、可搜索的子问题。
+请将此查询分解为 5–7 个具体的、可搜索的子问题。
 返回一个编号列表。"""
 
     return prompt
