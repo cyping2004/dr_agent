@@ -60,6 +60,7 @@
 
 主要目录结构如下（省略缓存与产物目录中的大量文件）：
 
+```
 dr_agent/
 ├── README.md
 ├── requirements.txt
@@ -94,6 +95,7 @@ dr_agent/
 ├── eval/
 ├── chroma_db/
 └── reports/
+```
 
 ## 4. 环境要求
 
