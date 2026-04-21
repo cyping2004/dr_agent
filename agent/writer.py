@@ -5,6 +5,7 @@
 
 import os
 import re
+from pathlib import Path
 from typing import List, Dict, Optional
 
 from langchain_openai import ChatOpenAI
@@ -147,12 +148,22 @@ def _evidence_item_to_text(
     将证据项转换为可读文本。
     """
     if isinstance(evidence_item, Document):
-        url = (evidence_item.metadata or {}).get("url", "")
-        title = (evidence_item.metadata or {}).get("title", "")
-        source = (evidence_item.metadata or {}).get("source", "")
+        metadata = evidence_item.metadata or {}
+        url = metadata.get("url", "")
+        title = metadata.get("title", "")
+        source = metadata.get("source", "")
+        source_type = str(metadata.get("source_type", "")).strip().lower()
+        filename = str(metadata.get("filename", "")).strip()
+        if not filename and source and source_type == "local":
+            filename = Path(str(source)).name
+
         header_parts = []
         if source:
             header_parts.append(f"来源: {source}")
+        if source_type:
+            header_parts.append(f"类型: {source_type}")
+        if filename:
+            header_parts.append(f"文档: {filename}")
         if title:
             header_parts.append(f"标题: {title}")
         if url:
@@ -281,26 +292,60 @@ def _collect_references(evidence: List[object]) -> tuple[List[Dict[str, str]], L
             metadata = evidence_item.metadata or {}
             title = (metadata.get("title") or "").strip()
             url = (metadata.get("url") or "").strip()
+            source = str(metadata.get("source") or "").strip()
+            filename = str(metadata.get("filename") or "").strip()
+            if not filename and source and source not in {"web_search", "unknown"}:
+                filename = Path(source).name
+
+            source_type = str(metadata.get("source_type") or "").strip().lower()
+            if not source_type:
+                if url:
+                    source_type = "web"
+                elif filename or metadata.get("file_type"):
+                    source_type = "local"
         else:
             title = ""
             url = ""
+            source = ""
+            filename = ""
+            source_type = ""
 
-        key = _reference_key(title, url)
+        key = _reference_key(title, url, filename, source_type, source)
         if key not in key_to_index:
             key_to_index[key] = len(references) + 1
-            references.append({"title": title, "url": url})
+            references.append(
+                {
+                    "title": title,
+                    "url": url,
+                    "filename": filename,
+                    "source_type": source_type,
+                    "source": source,
+                }
+            )
 
         evidence_ref_map.append(key_to_index[key])
 
     return references, evidence_ref_map
 
 
-def _reference_key(title: str, url: str) -> str:
+def _reference_key(
+    title: str,
+    url: str,
+    filename: str,
+    source_type: str,
+    source: str,
+) -> str:
     if url:
         normalized = url.strip().rstrip("/")
         return f"url:{normalized}"
+    if filename and source_type == "local":
+        return f"local:{filename.lower()}"
+    if filename:
+        return f"file:{filename.lower()}"
     if title:
         return f"title:{title.strip().lower()}"
+    if source:
+        return f"source:{source.strip().lower()}"
     return "unknown"
 
 
@@ -331,10 +376,17 @@ def _build_reference_section(references: List[Dict[str, str]]) -> str:
     for idx, entry in enumerate(references, start=1):
         title = (entry.get("title") or "").strip()
         url = (entry.get("url") or "").strip()
-        if title and url:
+        filename = (entry.get("filename") or "").strip()
+        source_type = (entry.get("source_type") or "").strip().lower()
+
+        if source_type == "local" and filename:
+            lines.append(f"[{idx}] 本地文档: {filename}")
+        elif title and url:
             lines.append(f"[{idx}] {title} ({url})")
         elif url:
             lines.append(f"[{idx}] {url}")
+        elif filename:
+            lines.append(f"[{idx}] 本地文档: {filename}")
         elif title:
             lines.append(f"[{idx}] {title}")
         else:

@@ -21,6 +21,7 @@ def run_cli(
     mode: str = "fast_web",
     test_mode: bool = False,
     output_path: str | None = None,
+    local_files: list[str] | None = None,
 ):
     """
     运行 CLI 界面。
@@ -28,7 +29,12 @@ def run_cli(
     Args:
         query: 可选的初始查询。如果未提供，将提示用户输入。
     """
-    mode_label = "Fast Web" if mode == "fast_web" else "Deep RAG"
+    mode_labels = {
+        "fast_web": "Fast Web",
+        "deep_rag": "Deep RAG",
+        "hybrid_deep_rag": "Hybrid Deep RAG",
+    }
+    mode_label = mode_labels.get(mode, mode)
     test_label = " + Test Mode" if test_mode else ""
     console.print(
         Panel(
@@ -47,7 +53,25 @@ def run_cli(
         console.print("[red]错误: 查询不能为空[/red]")
         sys.exit(1)
 
+    resolved_local_files: list[str] = []
+    if mode == "hybrid_deep_rag":
+        if not local_files:
+            console.print("[red]错误: hybrid_deep_rag 模式必须提供 --local-files[/red]")
+            sys.exit(1)
+
+        for file_path in local_files:
+            candidate = Path(file_path)
+            if not candidate.exists() or not candidate.is_file():
+                console.print(f"[red]错误: 本地文件不存在或不是文件: {file_path}[/red]")
+                sys.exit(1)
+            resolved_local_files.append(str(candidate.resolve()))
+
     console.print(f"\n[bold]正在处理查询:[/bold] {query}\n")
+    if resolved_local_files:
+        console.print("[bold]本地文件:[/bold]")
+        for file_path in resolved_local_files:
+            console.print(f"  - {file_path}")
+        console.print()
 
     # 创建初始状态
     state = ResearchState(
@@ -55,6 +79,7 @@ def run_cli(
         mode=mode,
         test_mode=test_mode,
         hitl_enabled=False,
+        local_files=resolved_local_files,
     )
 
     # 构建并运行图
@@ -144,9 +169,9 @@ def main():
     )
     parser.add_argument(
         "--mode",
-        choices=["fast_web", "deep_rag"],
+        choices=["fast_web", "deep_rag", "hybrid_deep_rag"],
         default="fast_web",
-        help="运行模式: fast_web | deep_rag"
+        help="运行模式: fast_web | deep_rag | hybrid_deep_rag"
     )
     parser.add_argument(
         "--test-mode",
@@ -159,9 +184,21 @@ def main():
         help="报告保存路径（可为文件或目录）"
     )
 
+    parser.add_argument(
+        "--local-files",
+        nargs="+",
+        help="hybrid_deep_rag 模式下需要摄取的本地文件列表"
+    )
+
     args = parser.parse_args()
 
-    run_cli(args.query, mode=args.mode, test_mode=args.test_mode, output_path=args.output)
+    run_cli(
+        args.query,
+        mode=args.mode,
+        test_mode=args.test_mode,
+        output_path=args.output,
+        local_files=args.local_files,
+    )
 
 
 if __name__ == "__main__":

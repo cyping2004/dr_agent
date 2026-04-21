@@ -13,7 +13,9 @@ from langchain_core.documents import Document
 class ResearchState:
     """研究代理的全局状态"""
     query: str
-    mode: str = "deep_rag"  # 模式: "fast_web", "deep_rag", "local_only"
+    mode: str = "deep_rag"  # 模式: "fast_web", "deep_rag", "hybrid_deep_rag", "local_only"
+    local_files: List[str] = field(default_factory=list)  # hybrid_deep_rag 模式下的本地文件列表
+    working_collection: str = ""  # 当前运行使用的临时向量集合名称
     hitl_enabled: bool = False  # 是否启用HITL回圈（默认端到端）
     test_mode: bool = False  # 是否启用测试模式（复用同一份Web搜索结果）
     web_search_cache: List[Document] = field(default_factory=list)

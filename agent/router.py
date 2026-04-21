@@ -31,7 +31,11 @@ def route(state: ResearchState) -> Literal["web_searcher", "retriever", "deep_ra
             - 路径: Planner -> WebSearcher -> Ingester -> Retriever -> EvidenceFusion -> Writer
             - 数据: Web 结果先入库，再通过相似度匹配提取精华
 
-        3. Local Only:
+        3. Hybrid Deep RAG:
+            - 路径: LocalIngestion -> Planner -> WebSearcher -> Ingester -> Retriever -> Writer
+            - 数据: 本地文档先入库，再与 Web 结果汇合检索
+
+        4. Local Only:
             - 路径: Planner -> Retriever -> EvidenceFusion -> Writer
             - 数据: 仅从本地向量库检索
     """
@@ -45,7 +49,7 @@ def route(state: ResearchState) -> Literal["web_searcher", "retriever", "deep_ra
         # 纯本地模式：仅从向量库检索
         return "retriever"
 
-    elif mode == "deep_rag":
+    elif mode in {"deep_rag", "hybrid_deep_rag"}:
         # 深度 RAG 模式：网络搜索 + 向量库压缩
         return "deep_rag"
 
@@ -64,7 +68,7 @@ def should_use_web_search(state: ResearchState) -> bool:
     Returns:
         True 如果需要网络搜索。
     """
-    return state.mode in ["fast_web", "deep_rag"]
+    return state.mode in ["fast_web", "deep_rag", "hybrid_deep_rag"]
 
 
 def should_use_local_retrieval(state: ResearchState) -> bool:
@@ -77,7 +81,7 @@ def should_use_local_retrieval(state: ResearchState) -> bool:
     Returns:
         True 如果需要本地检索。
     """
-    return state.mode in ["local_only", "deep_rag"]
+    return state.mode in ["local_only", "deep_rag", "hybrid_deep_rag"]
 
 
 def should_ingest_web_results(state: ResearchState) -> bool:
@@ -92,4 +96,4 @@ def should_ingest_web_results(state: ResearchState) -> bool:
     Returns:
         True 如果需要摄入网络结果。
     """
-    return state.mode == "deep_rag"
+    return state.mode in {"deep_rag", "hybrid_deep_rag"}

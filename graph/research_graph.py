@@ -4,6 +4,8 @@
 """
 
 from typing import Literal
+from uuid import uuid4
+from pathlib import Path
 
 from langgraph.graph import StateGraph, END
 
@@ -11,6 +13,7 @@ from agent.state import ResearchState
 from agent.planner import plan
 from agent.web_searcher import search
 from agent.writer import write
+from ingestion.parser import parse_files
 from ingestion.vector_store import VectorStore
 from ingestion.embedder import embed_documents
 from ingestion.chunker import chunk_documents
@@ -23,6 +26,7 @@ def build_graph() -> StateGraph:
     支持两种运行模式:
     1. fast_web: Planner -> WebSearcher -> Writer
     2. deep_rag: Planner -> WebSearcher -> Ingestion -> Retriever -> Writer
+    3. hybrid_deep_rag: LocalIngestion -> Planner -> WebSearcher -> Ingestion -> Retriever -> Writer
 
     Returns:
         编译后的 StateGraph。
@@ -30,6 +34,7 @@ def build_graph() -> StateGraph:
     graph = StateGraph(ResearchState)
 
     # 添加节点
+    graph.add_node("local_ingester", _local_ingestion_node)
     graph.add_node("planner", plan)
     graph.add_node("web_searcher", _web_search_node)
     graph.add_node("ingester", _ingestion_node)
@@ -37,7 +42,10 @@ def build_graph() -> StateGraph:
     graph.add_node("writer", write)
 
     # 设置入口点
-    graph.set_entry_point("planner")
+    graph.set_entry_point("local_ingester")
+
+    # 边：LocalIngestion -> Planner
+    graph.add_edge("local_ingester", "planner")
 
     # 边：Planner -> WebSearcher
     graph.add_edge("planner", "web_searcher")
@@ -74,9 +82,83 @@ def _route_after_web_search(state: ResearchState) -> Literal["writer", "ingester
     Returns:
         下一个节点的名称。
     """
-    if state.mode == "deep_rag":
+    if state.mode in {"deep_rag", "hybrid_deep_rag"}:
         return "ingester"
     return "writer"
+
+
+def _resolve_collection_name(state: ResearchState) -> str:
+    """Resolve and cache per-run temp collection name."""
+    if state.working_collection:
+        return state.working_collection
+
+    if state.mode == "hybrid_deep_rag":
+        state.working_collection = f"temp_hybrid_{uuid4().hex[:8]}"
+    else:
+        state.working_collection = "temp_web_results"
+
+    return state.working_collection
+
+
+def _local_ingestion_node(state: ResearchState) -> ResearchState:
+    """
+    hybrid_deep_rag 模式下，先将本地文件摄入向量数据库。
+
+    Args:
+        state: 当前研究状态。
+
+    Returns:
+        更新后的 ResearchState。
+    """
+    if state.mode != "hybrid_deep_rag":
+        return state
+
+    if not state.local_files:
+        print("[Local Ingestion] 未提供本地文件，跳过本地摄取")
+        return state
+
+    collection_name = _resolve_collection_name(state)
+    print(f"[Local Ingestion] 开始摄取本地文件到集合: {collection_name}")
+
+    docs = parse_files(state.local_files)
+    if not docs:
+        print("[Local Ingestion] 警告: 本地文件解析为空")
+        return state
+
+    from langchain_core.documents import Document
+
+    normalized_docs = []
+    for doc in docs:
+        metadata = dict(doc.metadata or {})
+        source_path = str(metadata.get("source", "")).strip()
+        filename = str(metadata.get("filename", "")).strip()
+        if not filename and source_path:
+            filename = Path(source_path).name
+
+        metadata["filename"] = filename
+        metadata["source_type"] = "local"
+        metadata.setdefault("source", source_path or "local_file")
+        metadata["ingestion_session"] = collection_name
+
+        normalized_docs.append(
+            Document(page_content=doc.page_content, metadata=metadata)
+        )
+
+    chunked_docs = chunk_documents(normalized_docs)
+
+    try:
+        embedded_pairs = embed_documents(chunked_docs)
+        texts = [doc.page_content for doc, _ in embedded_pairs]
+        metadatas = [doc.metadata for doc, _ in embedded_pairs]
+        embeddings = [embedding for _, embedding in embedded_pairs]
+
+        vector_store = VectorStore(collection_name=collection_name)
+        vector_store.upsert(texts, embeddings, metadatas=metadatas)
+        print(f"[Local Ingestion] 已存储 {len(chunked_docs)} 个本地文档块")
+    except Exception as e:
+        print(f"[Local Ingestion] 警告: 本地文档入库失败: {e}")
+
+    return state
 
 
 def _web_search_node(state: ResearchState) -> ResearchState:
@@ -118,7 +200,8 @@ def _ingestion_node(state: ResearchState) -> ResearchState:
     Returns:
         更新后的 ResearchState。
     """
-    print("[Ingestion] 将网络搜索结果摄入向量数据库...")
+    collection_name = _resolve_collection_name(state)
+    print(f"[Ingestion] 将网络搜索结果摄入向量数据库: {collection_name}")
 
     # 将 Web 结果补充 session 元数据后摄取
     from langchain_core.documents import Document
@@ -128,7 +211,8 @@ def _ingestion_node(state: ResearchState) -> ResearchState:
         if isinstance(evidence, Document):
             metadata = dict(evidence.metadata or {})
             metadata.setdefault("source", "web_search")
-            metadata["ingestion_session"] = "temp_web_results"
+            metadata.setdefault("source_type", "web")
+            metadata["ingestion_session"] = collection_name
             docs.append(Document(page_content=evidence.page_content, metadata=metadata))
         else:
             docs.append(
@@ -136,7 +220,8 @@ def _ingestion_node(state: ResearchState) -> ResearchState:
                     page_content=str(evidence),
                     metadata={
                         "source": "web_search",
-                        "ingestion_session": "temp_web_results",
+                        "source_type": "web",
+                        "ingestion_session": collection_name,
                     }
                 )
             )
@@ -150,7 +235,7 @@ def _ingestion_node(state: ResearchState) -> ResearchState:
         metadatas = [doc.metadata for doc, _ in embedded_pairs]
         embeddings = [embedding for _, embedding in embedded_pairs]
 
-        vector_store = VectorStore(collection_name="temp_web_results")
+        vector_store = VectorStore(collection_name=collection_name)
         vector_store.upsert(texts, embeddings, metadatas=metadatas)
         print(f"[Ingestion] 已存储 {len(chunked_docs)} 个文档到向量数据库")
     except Exception as e:
@@ -169,7 +254,7 @@ def _retriever_node(state: ResearchState) -> ResearchState:
     Returns:
         更新后的 ResearchState。
     """
-    collection_name = "temp_web_results"
+    collection_name = _resolve_collection_name(state)
 
     import agent.retriever as retriever_module
     retriever = retriever_module.Retriever(collection_name=collection_name)
@@ -177,6 +262,30 @@ def _retriever_node(state: ResearchState) -> ResearchState:
     retrieved_docs = []
     for task in state.research_tasks:
         retrieved_docs.extend(retriever.retrieve(task))
+
+    if state.mode == "hybrid_deep_rag":
+        try:
+            from agent.sparse_bm25 import doc_key
+
+            all_docs = retriever.vector_store.get_all_documents()
+            local_docs = [
+                doc
+                for doc in all_docs
+                if str((doc.metadata or {}).get("source_type", "")).strip().lower() == "local"
+            ]
+
+            seen = {doc_key(doc) for doc in retrieved_docs}
+            appended = 0
+            for doc in local_docs:
+                key = doc_key(doc)
+                if key not in seen:
+                    retrieved_docs.append(doc)
+                    seen.add(key)
+                    appended += 1
+
+            print(f"[Retriever] hybrid_deep_rag 保底追加本地证据 {appended} 条")
+        except Exception as e:
+            print(f"[Retriever] 警告: 追加本地证据失败: {e}")
 
     state.retrieved_evidence = retrieved_docs
 
