@@ -23,7 +23,8 @@ class TimingMetrics:
     writer_time_fast_ms: float = 0.0
     total_backend_time_fast_ms: float = 0.0
 
-    ingest_time_ms: float = 0.0
+    chunk_time_ms: float = 0.0
+    embed_time_ms: float = 0.0
     retrieve_time_ms: float = 0.0
     writer_time_rag_ms: float = 0.0
     total_backend_time_rag_ms: float = 0.0
@@ -106,7 +107,7 @@ class MetricsRecorder:
             "query_id", "query", "timestamp",
             "fast_web_total_time", "fast_web_writer_time",
             "fast_web_input_tokens", "fast_web_output_tokens",
-            "deep_rag_total_time", "deep_rag_ingest_time",
+            "deep_rag_total_time", "deep_rag_chunk_time", "deep_rag_embed_time",
             "deep_rag_retrieve_time", "deep_rag_writer_time",
             "deep_rag_input_tokens", "deep_rag_output_tokens",
             "compression_ratio", "compression_ratio_tokens",
@@ -145,7 +146,8 @@ class MetricsRecorder:
                     "fast_web_input_tokens": result.fast_web_metrics.get("input_tokens", 0),
                     "fast_web_output_tokens": result.fast_web_metrics.get("output_tokens", 0),
                     "deep_rag_total_time": rag_total,
-                    "deep_rag_ingest_time": result.deep_rag_metrics.get("ingest_time", 0),
+                    "deep_rag_chunk_time": result.deep_rag_metrics.get("chunk_time", 0),
+                    "deep_rag_embed_time": result.deep_rag_metrics.get("embed_time", 0),
                     "deep_rag_retrieve_time": result.deep_rag_metrics.get("retrieve_time", 0),
                     "deep_rag_writer_time": rag_writer,
                     "deep_rag_input_tokens": result.deep_rag_metrics.get("input_tokens", 0),

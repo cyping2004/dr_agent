@@ -176,7 +176,8 @@ def run_second_half(
             # 记录指标
             deep_metrics = {
                 "total_backend_time": deep_result.metrics.total_time_ms,
-                "ingest_time": deep_result.metrics.ingest_time_ms,
+                "chunk_time": deep_result.metrics.chunk_time_ms,
+                "embed_time": deep_result.metrics.embed_time_ms,
                 "retrieve_time": deep_result.metrics.retrieve_time_ms,
                 "writer_time": deep_result.metrics.writer_time_ms,
                 "original_doc_count": original_doc_count,

@@ -203,11 +203,6 @@ def main() -> None:
         default=None,
         help="Directory to write plots",
     )
-    parser.add_argument(
-        "--include-chunk",
-        action="store_true",
-        help="Include chunk-size ablation group",
-    )
     args = parser.parse_args()
 
     base_dir = Path(args.results_dir)
@@ -216,9 +211,8 @@ def main() -> None:
     groups = [
         ("Retrieval Mode", f"abl_{args.k_tag}_mode_", "retrieval_mode.png"),
         ("Multimodal View", f"abl_{args.k_tag}_view_", "multimodal_view.png"),
+        ("Chunk Size", f"abl_{args.k_tag}_chunk_", "chunk_size.png"),
     ]
-    if args.include_chunk:
-        groups.append(("Chunk Size", f"abl_{args.k_tag}_chunk_", "chunk_size.png"))
 
     for title, prefix, filename in groups:
         items = _collect_group(base_dir, prefix)

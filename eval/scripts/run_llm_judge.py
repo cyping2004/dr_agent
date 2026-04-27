@@ -75,6 +75,8 @@ def _score_report(
         "- Relevance: how well the report answers the query.\n"
         "- Completeness: how fully the report covers expected topics.\n"
         "- Faithfulness: factual accuracy and internal consistency; penalize unsupported claims.\n"
+        "- Evaluate the substantive report content only. Ignore any trailing reference/source appendix when scoring.\n"
+        "- If references or sources are considered at all, prefer reports with a more concise source list.\n"
         "Return strict JSON."
     )
     topics_text = ", ".join(expected_topics) if expected_topics else "(none)"
@@ -106,6 +108,8 @@ def _compare_reports(
     system_prompt = (
         "You are a strict comparative evaluator. Compare Report A (fast_web) and "
         "Report B (deep_rag). Choose a winner overall. "
+        "Evaluate the substantive report content only. Ignore any trailing reference/source appendix. "
+        "If references or sources matter at all, prefer the report with the more concise source list. "
         "Avoid ties unless truly equivalent. Return strict JSON."
     )
     topics_text = ", ".join(expected_topics) if expected_topics else "(none)"

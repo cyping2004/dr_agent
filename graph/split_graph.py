@@ -10,6 +10,7 @@ Graph拆分模块
 
 import time
 import re
+import asyncio
 from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -21,7 +22,7 @@ from agent.state import ResearchState
 from agent.planner import plan
 from agent.writer import write
 from ingestion.vector_store import VectorStore
-from ingestion.embedder import embed_documents
+from ingestion.embedder import embed_documents_async
 from ingestion.chunker import chunk_documents
 
 
@@ -74,7 +75,8 @@ class SecondHalfMetrics:
     """后半段执行指标"""
     mode: str
     top_k: int = 0
-    ingest_time_ms: float = 0.0
+    chunk_time_ms: float = 0.0
+    embed_time_ms: float = 0.0
     retrieve_time_ms: float = 0.0
     writer_time_ms: float = 0.0
     total_time_ms: float = 0.0
@@ -242,7 +244,41 @@ class SplitResearchGraph:
             SecondHalfResult: 报告和指标
         """
         from ingestion.vector_store import VectorStore
-        from ingestion.embedder import embed_documents
+        from langchain_core.documents import Document
+
+        metrics = SecondHalfMetrics(mode="deep_rag", top_k=top_k)
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            return asyncio.run(
+                self.run_deep_rag_second_half_async(
+                    first_half_output,
+                    top_k=top_k,
+                    score_threshold=score_threshold
+                )
+            )
+
+        raise RuntimeError(
+            "run_deep_rag_second_half is sync; call run_deep_rag_second_half_async instead."
+        )
+
+    async def run_deep_rag_second_half_async(
+        self,
+        first_half_output: FirstHalfOutput,
+        top_k: int = 5,
+        score_threshold: Optional[float] = None
+    ) -> SecondHalfResult:
+        """
+        异步执行Deep RAG后半段：documents → Ingest → Retrieve → Writer（跳过EvidenceFusion）
+
+        Args:
+            first_half_output: 前半段输出
+            top_k: 检索Top-K文档数
+
+        Returns:
+            SecondHalfResult: 报告和指标
+        """
+        from ingestion.vector_store import VectorStore
         from langchain_core.documents import Document
 
         metrics = SecondHalfMetrics(mode="deep_rag", top_k=top_k)
@@ -254,8 +290,8 @@ class SplitResearchGraph:
         collection_name = f"{self.collection_prefix}_{safe_query}_{int(time.time())}"
         self.current_collection = collection_name
 
-        # ========== 阶段1: Ingest ==========
-        ingest_start = time.time()
+        # ========== 阶段1: Chunk ==========
+        chunk_start = time.time()
 
         docs = []
         for idx, doc in enumerate(first_half_output.documents):
@@ -268,9 +304,15 @@ class SplitResearchGraph:
         metrics.original_chunk_count = len(chunked_docs)
         metrics.original_tokens = sum(self._count_tokens(doc.page_content) for doc in chunked_docs)
 
+        chunk_time = (time.time() - chunk_start) * 1000
+        metrics.chunk_time_ms = chunk_time
+
+        # ========== 阶段2: Embed ==========
+        embed_start = time.time()
+
         # 嵌入并存储
         try:
-            embedded_pairs = embed_documents(chunked_docs)
+            embedded_pairs = await embed_documents_async(chunked_docs)
             texts = [doc.page_content for doc, _ in embedded_pairs]
             metadatas = [doc.metadata for doc, _ in embedded_pairs]
             embeddings = [embedding for _, embedding in embedded_pairs]
@@ -280,10 +322,10 @@ class SplitResearchGraph:
         except Exception as e:
             print(f"[警告] 向量存储失败: {e}")
 
-        ingest_time = (time.time() - ingest_start) * 1000
-        metrics.ingest_time_ms = ingest_time
+        embed_time = (time.time() - embed_start) * 1000
+        metrics.embed_time_ms = embed_time
 
-        # ========== 阶段2: Retrieve ==========
+        # ========== 阶段3: Retrieve ==========
         retrieve_start = time.time()
 
         import agent.retriever as retriever_module
@@ -321,7 +363,7 @@ class SplitResearchGraph:
         if parent_doc_ids:
             metrics.retrieved_doc_count = len(parent_doc_ids)
 
-        # ========== 阶段3: Writer ==========
+        # ========== 阶段4: Writer ==========
         writer_start = time.time()
 
         final_state = ResearchState(
@@ -339,7 +381,7 @@ class SplitResearchGraph:
         metrics.output_tokens = self._count_tokens(result_state.report_draft)
 
         # 计算总时间
-        metrics.total_time_ms = ingest_time + retrieve_time + writer_time
+        metrics.total_time_ms = chunk_time + embed_time + retrieve_time + writer_time
 
         # 清理临时集合（可选）
         try:
@@ -352,7 +394,8 @@ class SplitResearchGraph:
             report=result_state.report_draft,
             metrics=metrics
         )
-
+        
+        
     def _web_search_node(self, state: ResearchState) -> ResearchState:
         """网络搜索节点包装器"""
         from agent.web_searcher import search
