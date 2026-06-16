@@ -21,6 +21,7 @@ from langchain_core.documents import Document
 from agent.state import ResearchState
 from agent.planner import plan
 from agent.writer import write
+import agent.writer as writer_module
 from ingestion.vector_store import VectorStore
 from ingestion.embedder import embed_documents_async
 from ingestion.chunker import chunk_documents
@@ -190,8 +191,13 @@ class SplitResearchGraph:
         """
         metrics = SecondHalfMetrics(mode="fast_web")
         metrics.original_doc_count = len(first_half_output.documents)
+        per_doc_max_chars = writer_module._get_fast_web_doc_max_chars()
         metrics.original_tokens = sum(
-            len(doc.page_content.split())
+            self._count_tokens(
+                writer_module._truncate_text(doc.page_content, per_doc_max_chars)
+                if per_doc_max_chars
+                else doc.page_content
+            )
             for doc in first_half_output.documents
         )
 

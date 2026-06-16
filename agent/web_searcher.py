@@ -4,11 +4,14 @@
 """
 
 import os
+import re
 from typing import List
 
 from langchain_core.documents import Document
 from tavily import TavilyClient
 from dotenv import load_dotenv
+
+_DDGS_TEXT_BACKENDS = ("duckduckgo", "bing", "brave", "mojeek", "yahoo")
 
 load_dotenv()
 
@@ -27,7 +30,10 @@ def search(query: str, num_results: int = 10) -> List[Document]:
     provider = os.getenv("WEB_SEARCH_PROVIDER", "tavily")
 
     if provider == "tavily":
-        return _search_tavily(query, num_results)
+        try:
+            return _search_tavily(query, num_results)
+        except Exception:
+            return _search_ddgs(query, num_results)
     else:
         return _search_duckduckgo(query, num_results)
 
@@ -65,7 +71,6 @@ def _search_tavily(query: str, num_results: int) -> List[Document]:
         title = result.get("title", "")
 
         # 去除 HTML 标签并截断长内容
-        import re
         content = re.sub(r'<[^>]+>', '', content)
 
         doc = Document(
@@ -83,7 +88,7 @@ def _search_tavily(query: str, num_results: int) -> List[Document]:
 
 def _search_duckduckgo(query: str, num_results: int) -> List[Document]:
     """
-    使用 DuckDuckGo 进行搜索（无需 API 密钥）。
+    使用 DuckDuckGo 兼容后端进行搜索（无需 API 密钥）。
 
     Args:
         query: 搜索查询。
@@ -93,33 +98,89 @@ def _search_duckduckgo(query: str, num_results: int) -> List[Document]:
         List of Document objects.
     """
     try:
+        return _search_ddgs(query, num_results)
+    except Exception:
+        return _search_tavily(query, num_results)
+
+
+def _search_ddgs(query: str, num_results: int) -> List[Document]:
+    """
+    使用 DDGS 的多个文本搜索后端进行搜索。
+
+    该实现优先尝试 DuckDuckGo；如果当前网络环境无法访问，再按顺序
+    回退到 Bing、Brave、Mojeek 等可用后端，避免默认后端失效导致整条
+    搜索链路中断。
+
+    Args:
+        query: 搜索查询。
+        num_results: 返回结果数量。
+
+    Returns:
+        List of Document objects。
+    """
+    try:
         from ddgs import DDGS
+        from ddgs.exceptions import DDGSException
     except ImportError:
         raise ImportError(
             "ddgs not installed. "
             "Install it with: pip install ddgs"
         )
 
-    docs = []
-    with DDGS() as ddgs:
-        results = list(ddgs.text(query, max_results=num_results))
+    last_error = None
 
-        for result in results:
-            content = result.get("body", "")
-            url = result.get("href", "")
-            title = result.get("title", "")
+    for backend in _DDGS_TEXT_BACKENDS:
+        try:
+            with DDGS() as ddgs:
+                results = list(ddgs.text(query, max_results=num_results, backend=backend))
 
-            if len(content) > 2000:
-                content = content[:2000] + "..."
+                docs = []
+                for result in results:
+                    url = result.get("href") or result.get("url") or ""
+                    title = result.get("title", "")
+                    original_content = result.get("body", "") or result.get("snippet", "")
+                    content = original_content
 
-            doc = Document(
-                page_content=content,
-                metadata={
-                    "url": url,
-                    "title": title,
-                    "source": "web",
-                }
-            )
-            docs.append(doc)
+                    if url:
+                        try:
+                            extracted = ddgs.extract(url, fmt="text_plain")
+                            extracted_content = extracted.get("content", "") or ""
+                            if extracted_content and not extracted_content.lstrip().startswith("%PDF-"):
+                                content = extracted_content
+                        except Exception:
+                            pass
 
-    return docs
+                    if content.lstrip().startswith("%PDF-"):
+                        content = original_content or title or url
+
+                    content = re.sub(r"<[^>]+>", "", content)
+                    content = re.sub(r"\s+", " ", content).strip()
+
+                    if len(content) > 4000:
+                        content = content[:4000] + "..."
+
+                    if not content:
+                        content = title or url
+
+                    docs.append(
+                        Document(
+                            page_content=content,
+                            metadata={
+                                "url": url,
+                                "title": title,
+                                "source": "web",
+                                "search_backend": backend,
+                            },
+                        )
+                    )
+
+                if docs:
+                    return docs
+        except Exception as exc:
+            last_error = exc
+            continue
+
+    if last_error is not None:
+        raise DDGSException(str(last_error))
+
+    raise DDGSException("No results found.")

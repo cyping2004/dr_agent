@@ -141,6 +141,7 @@ def run_second_half(
                 f.write(f"**查询**: {query}\n\n")
                 f.write(f"**模式**: Fast Web\n\n")
                 f.write(f"**执行时间**: {fast_result.metrics.total_time_ms:.2f}ms\n\n")
+                f.write(f"**Token**: {fast_result.metrics.input_tokens:.2f}x\n\n")
                 f.write(f"---\n\n")
                 f.write(fast_result.report)
 
@@ -201,7 +202,10 @@ def run_second_half(
                 if score_threshold is not None:
                     f.write(f"**相似度阈值**: {score_threshold}\n\n")
                 f.write(f"**执行时间**: {deep_result.metrics.total_time_ms:.2f}ms\n\n")
+                f.write(f"**embed时间**: {deep_result.metrics.embed_time_ms:.2f}ms\n\n")
+                f.write(f"**writer时间**: {deep_result.metrics.writer_time_ms:.2f}ms\n\n")
                 f.write(f"**压缩比**: {compression_ratio:.2f}x\n\n")
+                f.write(f"**Token**: {deep_result.metrics.input_tokens:.2f}x\n\n")
                 f.write(f"**Token压缩比**: {compression_ratio_tokens:.2f}x\n\n")
                 f.write(f"---\n\n")
                 f.write(deep_result.report)

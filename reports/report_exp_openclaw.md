@@ -52,7 +52,7 @@ OpenClaw 是AI Agent领域一个具有里程碑意义的开源项目，它成功
 [4] OpenClaw：高强度使用两周，这个AI 工具颠覆了我的工作流- 少数派 (https://sspai.com/post/106232)
 [5] OpenClaw 工作原理 | 菜鸟教程 (https://www.runoob.com/ai-agent/openclaw-how-it-works.html)
 [6] OpenClaw是什么？AI 代理“龙虾”的全面介绍与使用指南 - Lark (https://www.larksuite.com/zh_cn/blog/openclaw)
-[7] [PDF] 2025 Agent元年，AI从L2向L3发展 (https://pdf.dfcfw.com/pdf/H3_AP202505041667413598_1.pdf?1746459426000.pdf)
+[7] 本地文档: openclaw.pdf
 [8] OpenClaw 完全指南：从周末项目到 GitHub 史上最快破 20 万 Star 的 AI AgentOpenCl - 掘金 (https://juejin.cn/post/7607731589925126180)
 [9] 什么是AI 智能体？ - 英伟达 (https://www.nvidia.cn/glossary/ai-agents/)
 [10] OpenClaw 深度研究报告_人工智能_凌机一动-DAMO开发者矩阵 (https://damodev.csdn.net/698988960a2f6a37c590d1e3.html)

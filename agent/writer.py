@@ -215,12 +215,12 @@ def _truncate_text(text: str, max_chars: int) -> str:
 def _get_fast_web_doc_max_chars() -> int:
     value = os.getenv("FAST_WEB_DOC_MAX_CHARS")
     if value is None:
-        return 1000
+        return 10000
     try:
         parsed = int(value)
     except ValueError:
-        return 1000
-    return parsed if parsed > 0 else 1000
+        return 10000
+    return parsed if parsed > 0 else 10000
 
 
 def _build_writer_prompt(query: str, evidence_text: str) -> str:

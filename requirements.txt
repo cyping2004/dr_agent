@@ -23,6 +23,7 @@ python-dotenv
 pydantic>=2.0
 rich               # 漂亮的CLI输出
 reportlab          # 用于测试PDF生成
+matplotlib         # 结果汇总与柱状图
 
 # Testing
 pytest

@@ -1,20 +1,70 @@
 #!/usr/bin/env python3
-"""Generate retrieval ablation plots (Recall-only, bar charts) from CSV results."""
+"""从 CSV 结果生成检索消融图（仅召回率，柱状图）。"""
 
 import argparse
 import csv
 import os
 import re
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import font_manager
+
+
+def _find_cjk_font() -> Optional[Path]:
+    env_path = os.getenv("CJK_FONT_PATH")
+    candidates = []
+    if env_path:
+        candidates.append(Path(env_path))
+
+    eval_dir = Path(__file__).resolve().parents[1]
+    candidates.append(eval_dir / "fonts" / "NotoSansCJKsc-Regular.otf")
+
+    for path in candidates:
+        if path.exists():
+            return path
+    return None
+
+
+def _configure_plot_style() -> None:
+    plt.rcParams.update(
+        {
+            "font.size": 14,
+            "axes.titlesize": 18,
+            "axes.labelsize": 14,
+            "xtick.labelsize": 13,
+            "ytick.labelsize": 13,
+            "legend.fontsize": 12,
+            "font.sans-serif": [
+                "Noto Sans CJK SC",
+                "SimHei",
+                "Microsoft YaHei",
+                "Arial Unicode MS",
+                "DejaVu Sans",
+            ],
+            "axes.unicode_minus": False,
+            "svg.fonttype": "path",
+        }
+    )
+
+    font_path = _find_cjk_font()
+    if font_path:
+        font_manager.fontManager.addfont(str(font_path))
+        font_name = font_manager.FontProperties(fname=str(font_path)).get_name()
+        plt.rcParams["font.sans-serif"] = [font_name, "DejaVu Sans"]
+        plt.rcParams["font.family"] = "sans-serif"
+    else:
+        print(
+            "[图表] 未找到中文字体。可以设置环境变量 CJK_FONT_PATH，"
+            "或将 NotoSansCJKsc-Regular.otf 放到 eval/fonts/ 目录。"
+        )
 
 
 METRICS = ("recall",)
 
-# Random retrieval baseline recall@k (8.33%, 13.89%, 27.78%, 55.56%).
+# 随机检索基线的 Recall@k（8.33%、13.89%、27.78%、55.56%）。
 RANDOM_BASELINE_RECALL = {
     3: 0.0833,
     5: 0.1389,
@@ -22,7 +72,7 @@ RANDOM_BASELINE_RECALL = {
     20: 0.5556,
 }
 
-# Colorblind-friendly palette suitable for paper figures.
+# 适合论文图的色盲友好配色。
 PAPER_PALETTE = [
     "#4E79A7",
     "#59A14F",
@@ -106,15 +156,15 @@ def _plot_group(group_name: str, items: List[Tuple[str, Path]], output_path: Pat
     if not items:
         return
 
-    fig, ax = plt.subplots(figsize=(7, 4))
+    fig, ax = plt.subplots(figsize=(7.6, 4.4))
 
     data_by_label: Dict[str, Dict[int, Dict[str, float]]] = {}
     for label, csv_path in items:
         rows = _load_csv(csv_path)
         data_by_label[label] = _aggregate(rows)
 
-    # 特殊处理：Multimodal View 去重
-    if group_name == "Multimodal View":
+    # 特殊处理：多模态视图去重
+    if group_name == "多模态视图":
         caption_data = data_by_label.get("caption")
         image_data = data_by_label.get("image")
         if caption_data and image_data and _series_equal(caption_data, image_data):
@@ -154,16 +204,16 @@ def _plot_group(group_name: str, items: List[Tuple[str, Path]], output_path: Pat
             x[valid_mask] + baseline_offset,
             baseline_vals[valid_mask],
             width,
-            label="random-baseline",
+            label="随机基线",
             color=BASELINE_COLOR,
             edgecolor="white",
             linewidth=0.8,
         )
 
     ax.set_facecolor("#FAFAFA")
-    ax.set_title(f"{group_name} (Recall@k)", fontsize=12, fontweight="semibold", pad=10)
-    ax.set_xlabel("k")
-    ax.set_ylabel("Recall")
+    ax.set_title(f"{group_name} Recall@k", fontsize=18, fontweight="semibold", pad=10)
+    ax.set_xlabel("k 值")
+    ax.set_ylabel("召回率")
     ax.set_xticks(x)
     ax.set_xticklabels(ks)
     ax.set_ylim(0.0, 1.0)
@@ -174,34 +224,35 @@ def _plot_group(group_name: str, items: List[Tuple[str, Path]], output_path: Pat
     ax.spines["right"].set_visible(False)
     ax.spines["left"].set_color("#666666")
     ax.spines["bottom"].set_color("#666666")
-    ax.tick_params(axis="both", labelsize=10)
-    ax.legend(fontsize=8, frameon=True, framealpha=0.95, edgecolor="#D0D0D0")
+    ax.tick_params(axis="both", labelsize=13)
+    ax.legend(fontsize=12, frameon=True, framealpha=0.95, edgecolor="#D0D0D0")
 
     fig.tight_layout()
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(output_path, dpi=150)
+    fig.savefig(output_path, format="svg")
     plt.close(fig)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Plot retrieval ablation results (Recall only)")
+    _configure_plot_style()
+    parser = argparse.ArgumentParser(description="绘制检索消融结果（仅召回率）")
     parser.add_argument(
         "--k-tag",
         type=str,
         default="k3_5_10_20",
-        help="k-list tag used in result folder names (e.g., k3_5_10_20)",
+        help="结果目录名中的 k 列表标签（例如：k3_5_10_20）",
     )
     parser.add_argument(
         "--results-dir",
         type=str,
         default="eval/results",
-        help="Directory containing ablation results",
+        help="包含消融结果的目录",
     )
     parser.add_argument(
         "--output-dir",
         type=str,
         default=None,
-        help="Directory to write plots",
+        help="输出图表目录",
     )
     args = parser.parse_args()
 
@@ -209,16 +260,16 @@ def main() -> None:
     out_dir = Path(args.output_dir or f"eval/results/plots_{args.k_tag}")
 
     groups = [
-        ("Retrieval Mode", f"abl_{args.k_tag}_mode_", "retrieval_mode.png"),
-        ("Multimodal View", f"abl_{args.k_tag}_view_", "multimodal_view.png"),
-        ("Chunk Size", f"abl_{args.k_tag}_chunk_", "chunk_size.png"),
+        ("不同检索模式下", f"abl_{args.k_tag}_mode_", "retrieval_mode.svg"),
+        ("多模态视图", f"abl_{args.k_tag}_view_", "multimodal_view.svg"),
+        ("切块大小", f"abl_{args.k_tag}_chunk_", "chunk_size.svg"),
     ]
 
     for title, prefix, filename in groups:
         items = _collect_group(base_dir, prefix)
         _plot_group(title, items, out_dir / filename)
 
-    print(f"[Plots] Output dir: {out_dir}")
+    print(f"[图表] 输出目录：{out_dir}")
 
 
 if __name__ == "__main__":
